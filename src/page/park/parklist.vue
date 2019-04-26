@@ -92,7 +92,7 @@
 					
 					<el-form-item label="车场地址" prop="address">
 						<el-col :span="18">
-			      			<el-input v-model="form.address" auto-complete="off" @blur="searchMap" id="suggestId"></el-input>
+			      			<el-input v-model="form.address" auto-complete="off" @keyup.enter.native="searchMap" id="suggestId"></el-input>
 			      		</el-col>
 			    	</el-form-item>
 
@@ -558,7 +558,7 @@
 			},
 			addrOrEdit:function(id){
 				this.dialogFormVisible=true;
-				this.mapStart()
+				
 				this.$nextTick(function(){
 					this.map = new BMap.Map("areaMap"); 
 					this.map.centerAndZoom(new BMap.Point(113.937122, 22.542874), 12);   
@@ -580,6 +580,7 @@
 
 					    });
 					});
+					this.mapStart()
 				});
 
 				if(Boolean(id)){
@@ -937,7 +938,7 @@
 				this.$nextTick(function () {
 					var th = this
 					// 创建Map实例
-					var map = new BMap.Map("areaMap");
+					var map = this.map
 					// 初始化地图,设置中心点坐标，
 					var point = new BMap.Point(114.064552,22.548457);
 					map.centerAndZoom(point, 18);
@@ -950,7 +951,7 @@
 					var myValue
 					ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
 						var _value = e.item.value;
-						myValue = _value.business;
+						myValue = _value.province + _value.city + _value.district + _value.street + _value.business;
 						th.form.address = myValue;
 						setPlace();
 					});
@@ -958,9 +959,8 @@
 						map.clearOverlays();    //清除地图上所有覆盖物
 						function myFun(){
 							var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
-							map.centerAndZoom(pp, 18);
+							map.centerAndZoom(pp, 16);
 							map.addOverlay(new BMap.Marker(pp));    //添加标注
-
 						}
 						var local = new BMap.LocalSearch(map, { //智能搜索
 							onSearchComplete: myFun

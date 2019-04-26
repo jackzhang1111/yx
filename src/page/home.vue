@@ -82,7 +82,7 @@
 					var span = this._span = document.createElement("span");
 
 					div.appendChild(span);	
-					console.log(this)
+					// console.log(this)
 					span.appendChild(document.createTextNode(this._text)); 
 
 					     

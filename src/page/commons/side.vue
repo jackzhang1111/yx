@@ -158,7 +158,7 @@
 		   	homeItem:function(link){
 		   		this.curIndex=['0'];
 		   		this.$router.push(link);
-		   		this.isActive=true;
+		   		this.isActive=true;	
 
 		   	}
 
