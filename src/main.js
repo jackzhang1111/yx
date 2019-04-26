@@ -24,6 +24,8 @@ import './assets/css/reset.css';
 import './assets/css/baselist.css';
 import './assets/css/ele-reset.css';
 
+import { objDeepCopy } from "./utils/funciton.js"
+
 Vue.use(VueQuillEditor);
 
 Vue.use(ElementUI);
@@ -39,6 +41,8 @@ Vue.prototype.$get=get;
 Vue.prototype.$postRequest=postRequest;
 Vue.prototype.$putRequest=putRequest;
 Vue.prototype.$deleteRequest=deleteRequest;
+
+Vue.prototype.$fn = {copy:objDeepCopy}
 
 Vue.config.productionTip = false
 

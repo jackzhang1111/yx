@@ -46,7 +46,7 @@
                     </tr>
                 </thead>
                 <tbody id="tbody">
-                    <tr v-for="item in tableListData.rows">
+                    <tr v-for="(item,index) in tableListData.rows" :key='index'>
                     	<td>{{item.crtTime}}</td>
                         <td>{{item.corporateName}}</td>
                         <td>{{item.telephone}}</td>
@@ -86,7 +86,7 @@
                         <img :src="imgUrl" alt="" style="max-height:300px;max-width:540px;">
                     </div>
                     <ul class="tab-img clearfix">
-                    	<li class="fl" @click="handleClickTag(item)" v-for="(item,index) in allImgUrl">
+                    	<li class="fl" @click="handleClickTag(item)" v-for="(item,index) in allImgUrl" :key="index">
                     		<a href="javascript:;"><img :src="item" alt="" width="100%" height="100%"></a>
                     	</li>
                     </ul>

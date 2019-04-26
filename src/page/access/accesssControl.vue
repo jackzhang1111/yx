@@ -102,7 +102,7 @@ export default {
                 beginTime:"",
                 endTime:""
             },
-            dataList:{},
+            dataList:[],
             total:0,
             dialogFormVisiblePhoto:false,
             itemDetail:{},

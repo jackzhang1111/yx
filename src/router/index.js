@@ -16,6 +16,8 @@ import Staff from '../page/park/staff.vue'
 
 import PlateCheck from '../page/check/platecheck.vue'
 import PrivateSpace from '../page/check/privatespace.vue'
+import Freeze from '../page/check/freeze.vue'
+import Eliminate from '../page/check/eliminate.vue'
 
 import UserList from '../page/user/userlist.vue'
 import Manager from '../page/user/manager.vue'
@@ -34,6 +36,9 @@ import Edit from '../page/consult/edit2.vue'
 
 //出入口
 import accesssControl from '@/page/access/accesssControl.vue'
+
+//出租规则
+import RentOut from '../page/regulation/rentOut.vue'
 
 Vue.use(Router)
 
@@ -78,6 +83,14 @@ export default new Router({
             path: '/main/check/privatespace',
             name:'共享',
             component:PrivateSpace
+        },{
+            path: '/main/check/freeze',
+            name:'冻结',
+            component:Freeze
+        },{
+            path: '/main/check/eliminate',
+            name:'注销',
+            component:Eliminate
         },{
             path: '/main/user/userlist',
             name:'车主',
@@ -128,6 +141,10 @@ export default new Router({
             path: '/main/access/accesssControl',
             name:'出入口',
             component:accesssControl
+        },{
+            path: '/main/regulation/rentOut',
+            name:'出租规则',
+            component:RentOut
         }]
     }
   ]

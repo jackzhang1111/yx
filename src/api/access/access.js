@@ -1,9 +1,9 @@
-import mainAxios from '@/api/index'
+import {main, park} from '@/api/index'
 
 export function getAccessApi(params) {
-    return mainAxios({
-      url: 'parking/ioRecord/page',
-      method: 'get',
-      params
-    })
-  }
+  return main({
+    url: 'parking/ioRecord/page',
+    method: 'get',
+    params
+  })
+}

@@ -88,6 +88,12 @@
 					},{
 						href:"/main/check/platecheck",
 						title:"车牌审核"
+					},{
+						href:"/main/check/freeze",
+						title:"冻结审核"
+					},{
+						href:"/main/check/eliminate",
+						title:"注销审核"
 					}]
 				},{
 					icon:"./static/images/feedback.png",
@@ -115,6 +121,13 @@
 					children:[{
 						href:"/main/access/accesssControl",
 						title:"出入口"
+					}]
+				},{
+					icon:"./static/images/rentOut.png",
+					title:"规则管理",
+					children:[{
+						href:"/main/regulation/rentOut",
+						title:"出租规则"
 					}]
 				}],
 	            // isCollapse:false,

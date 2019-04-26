@@ -2541,12 +2541,10 @@
 					this.$putRequest(addEditIo()+'/'+this.formBase.id,{
 						parkingId:this.parkId,
 						parkingAreaId:this.areaInfo.id,
-
 						parkingIoId:this.formBase.id,
-
 						x:0,
-						y:0
-
+						y:0,
+						version:this.version
 					}).then((data) => {
         				if(data.status!=200) return;
 			            this.getMapInfo(this.areaInfo,true);
