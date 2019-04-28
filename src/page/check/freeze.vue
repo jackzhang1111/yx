@@ -61,7 +61,7 @@
                         <td>{{item.telephone}}</td>
                         <td>
                         	<a title="审核" href="javascript:;" @click="check(item.status,item)">
-                                <span>{{item.status == 0 ? '未审核': item.status == 1 ? '通过' : '拒绝'}}</span>
+                                <span :class="{ 'fontgay': !freeze_btn_edit }">{{item.status == 0 ? '未审核': item.status == 1 ? '通过' : '拒绝'}}</span>
                             </a>
                         </td>
                     </tr>
@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import {mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 import {getfreezeAuditApi,freezeAuditApi} from '@/api/check/freeze'
 export default {
     data() {
@@ -121,6 +121,7 @@ export default {
                 id:''
             },
             dialogFormVisible:false,
+            freeze_btn_edit:false, //冻结权限按钮
             auditName:'冻结审核',
             total:0,
             status:[
@@ -154,7 +155,7 @@ export default {
         };
     },
     created() {
-
+        this.permiss
     },
     mounted() {
         this.getfreezeAudit()
@@ -163,8 +164,7 @@ export default {
     methods: {
         //查询
         searchList(){
-            // this.getfreezeAudit()
-            console.log(this.elements,'this.elements');
+            this.getfreezeAudit()
         },
         //清空
         clearSearch(){
@@ -176,6 +176,7 @@ export default {
         //操作按钮
         check(status,item){
             if(status != 0) return 
+            if(!this.freeze_btn_edit) return
             this.dialogFormVisible = true
             this.currentItem.userSpaceId = item.userSpaceId
             this.currentItem.id = item.id
@@ -198,6 +199,7 @@ export default {
             getfreezeAuditApi(this.search).then(res => {
                 if(res.status == 200){
                     this.dataList = res.data.rows
+                    this.total = res.data.total
                 }
             })
         },
@@ -215,8 +217,19 @@ export default {
 
     },
     computed:{
-        ...mapGetters(['elements'])
+        ...mapGetters(['elements']),
+        permiss(){
+            this.freeze_btn_edit = this.elements['freeze:btn_edit'];
+        },
     },
+    watch:{
+        elements: {
+            handler: function (val, oldVal) {
+                this.permiss;
+            },
+            deep: true 	//深度
+        }
+    }
 };
 </script>
 

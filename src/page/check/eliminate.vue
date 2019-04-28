@@ -62,7 +62,7 @@
                         <td>{{item.telephone}}</td>
                         <td>
                         	<a title="审核" href="javascript:;" @click="check(item.status,item)">
-                                <span>{{item.status == 0 ? '未审核': item.status == 1 ? '通过' : '拒绝'}}</span>
+                                <span :class="{'fontgay':!eliminate_btn_edit}">{{item.status == 0 ? '未审核': item.status == 1 ? '通过' : '拒绝'}}</span>
                             </a>
                         </td>
                     </tr>
@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import {mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 import {getCancellationApi,cancellationAuditApi} from '@/api/check/eliminate'
 export default {
     data() {
@@ -123,6 +123,7 @@ export default {
             },
             dataList:[],
             dialogFormVisible:false,
+            eliminate_btn_edit:false,
             auditName:'注销审核',
             total:0,//共多少条
             status:[
@@ -156,7 +157,7 @@ export default {
         };
     },
     created() {
-
+        this.permiss
     },
     mounted() {
         this.getCancellation()
@@ -176,6 +177,7 @@ export default {
         //审核
         check(status,item){
             if(status != 0) return 
+            if(!this.eliminate_btn_edit) return
             this.dialogFormVisible = true
             this.currentItem.userSpaceId = item.userSpaceId
             this.currentItem.id = item.id
@@ -198,6 +200,7 @@ export default {
             getCancellationApi(this.search).then(res => {
                 if(res.status == 200){
                     this.dataList = res.data.rows
+                    this.total = res.data.total
                 }
             })
         },
@@ -215,8 +218,19 @@ export default {
 
     },
     computed: {
-        ...mapGetters(['elements'])
+        ...mapGetters(['elements']),
+        permiss(){
+            this.eliminate_btn_edit = this.elements['eliminate:btn_edit'];
+        },
     },
+    watch:{
+        elements: {
+            handler: function (val, oldVal) {
+                this.permiss;
+            },
+            deep: true 	//深度
+        }
+    }
 };
 </script>
 

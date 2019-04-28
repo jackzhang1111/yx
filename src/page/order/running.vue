@@ -192,7 +192,7 @@
 		watch:{
 			$route(to, from) {
 				var curPath=to.path;
-				console.log(to);
+				// console.log(to);
 				if(curPath=='/main/order/running'){
 					this.search.status='running'
 				}else if(curPath=='/main/order/complete'){

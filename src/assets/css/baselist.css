@@ -237,3 +237,6 @@ canvas{
 	height:340px;
 	background: pink;
 }
+.tangram-suggestion-main{
+	z-index: 2002 !important
+}

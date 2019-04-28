@@ -56,15 +56,17 @@
                 </div>
             </el-col>
         </el-row>
-        <el-button type="success" class="rent-btn" :loading="loading" @click="submit">提交</el-button>
+        <el-button type="success" class="rent-btn" :loading="loading" @click="submit" v-if="rentout_btn_edit">提交</el-button>
     </div>
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 import {getSharingRuleReApi,updateSharingRuleApi} from '@/api/regulation/rentOut'
 export default {
     data() {
         return {
+            rentout_btn_edit:false,
             form:{
                 freezingTimes:'',//冻结次数
                 frozenLeadTime:'',//冻结提前时间
@@ -127,8 +129,19 @@ export default {
 
     },
     computed: {
-
+        ...mapGetters(['elements']),
+        permiss(){
+            this.rentout_btn_edit = this.elements['rentout:btn_edit'];
+        }
     },
+    watch:{
+        elements: {
+            handler: function (val, oldVal) {
+                this.permiss;
+            },
+            deep: true 	//深度
+        }
+    }
 };
 </script>
 
