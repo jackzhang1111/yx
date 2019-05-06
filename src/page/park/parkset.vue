@@ -37,12 +37,12 @@
 								            @click="() => editArea(node, data)">
 								            <i class="el-icon-edit-outline"></i>
 								        </el-button>
-								        <el-button v-else-if="parkset_btn_edit"
+								        <!-- <el-button v-else-if="parkset_btn_edit"
 								            type="text"
 								            size="mini"
 								            @click="() => editPark(node, data)">
 								            <i class="el-icon-edit-outline"></i>
-								        </el-button>
+								        </el-button> -->
 								    </span>
 						      	</span>
 							</el-tree>

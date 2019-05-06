@@ -8,7 +8,7 @@
                 </div>
                 <button @click="searchList" type="button" class="btn btn-primary" id="search_btn">查询</button>
                 <button @click="clearSearch" type="button" class="btn btn-default">清空</button>
-                <button v-if="parklist_btn_add" type="button" class="btn btn-default" id="addarea" @click="addrOrEdit()">添加</button>
+                <button v-if="parklist_btn_add" type="button" class="btn btn-default" id="addarea" @click="addrOrEdit">添加</button>
             </form>
 		</div>
 		
@@ -36,8 +36,8 @@
                         <td>
                         	<a v-if="parklist_btn_rule" class="margin-right" title="收费规则" href="javascript:;" @click="getChargeRule(item.parkingId,item.chargeRuleId)"><span>收费规则</span></a>
                         	<a v-if="parklist_btn_pkset" class="margin-right" title="车场设置" href="javascript:;" @click="toView(item.parkingId,item.parkingName)"><span>车场设置</span></a>
-                        	<a v-if="parklist_btn_person" title="人员管理" href="javascript:;" @click="toStaff(item.parkingId,item.parkingName)"><span>人员管理</span></a>
-
+                        	<a v-if="parklist_btn_person" class="margin-right" title="人员管理" href="javascript:;" @click="toStaff(item.parkingId,item.parkingName)"><span>人员管理</span></a>
+							<a  title="停车场修改" v-if="parklist_btn_edit" href="javascript:;" @click="editPark(item)"><span>停车场修改</span></a>
 
                         	<span v-show="false">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         	<a v-show="false" title="删除" href="javascript:;" @click="delPark(item.parkingId)"><span>删除</span></a>
@@ -54,7 +54,7 @@
 		
 
 		<!-- 添加停车场 -->
-		<el-dialog title="添加停车场" :visible.sync="dialogFormVisible" width="900px"  @open="openDialog" @close="closeDialog">
+		<el-dialog :title="parkingStatus" :visible.sync="dialogFormVisible" width="900px"  @open="openDialog" @close="closeDialog">
 			<div class="clearfix">
 				<el-form class="fl" style="width:45%;" ref="form" label-position="right" :model="form" :rules="rules" :label-width="formLabelWidth" id="form">
 					
@@ -290,7 +290,7 @@
 <script>
 	import { mapState, mapMutations,mapGetters } from 'vuex';
 
-	import {parkingBusType,dictValue,getCity,parkList,getRulesType,addOrUpdateChargeRule,getChargeRule,parkAdd,addMapOverlay,addMapOverlayl,setMapEvent,addMapControl,getManagerList} from '../../api/url';
+	import {parkingBusType,dictValue,getCity,parkList,getRulesType,addOrUpdateChargeRule,getChargeRule,parkAdd,addMapOverlay,addMapOverlayl,getParkSingle,setMapEvent,addMapControl,getManagerList} from '../../api/url';
 
 	import Page from '../commons/page.vue';
 	
@@ -301,9 +301,11 @@
       			parklist_btn_add: false,
       			parklist_btn_rule: false,
       			parklist_btn_pkset: false,
-      			parklist_btn_person: false,
+				parklist_btn_person: false,
+				parklist_btn_edit:false,
 
-
+				isEdit:false,//是否点击停车场修改
+				parkingStatus:'添加停车场',
 				search:{
 					pageNumber:1,
 					pageSize:15,
@@ -558,7 +560,8 @@
 			},
 			addrOrEdit:function(id){
 				this.dialogFormVisible=true;
-				
+				this.isEdit = false
+				this.parkingStatus = '添加停车场'
 				this.$nextTick(function(){
 					this.map = new BMap.Map("areaMap"); 
 					this.map.centerAndZoom(new BMap.Point(113.937122, 22.542874), 12);   
@@ -591,7 +594,10 @@
 
 			},
 			addrOrEditTrue:function(){
-
+				if(this.isEdit){
+					this.editParkTrue()
+					return
+				}
 				var _this=this;
 
 				this.$refs['form'].validate(function(valid,noStri){
@@ -622,6 +628,41 @@
 						}).then((data) => {
 	        				if(data.status!=200) return;
 				            _this.tableList(_this.curIndex);
+	      				});
+
+					}
+				});
+				
+			},
+			editParkTrue(){
+				var _this=this;
+				this.$refs['form'].validate(function(valid,noStri){
+					// console.log(valid)
+					if(valid){
+						_this.dialogFormVisible = false;
+
+						_this.$putRequest(parkAdd()+'/'+_this.form.id,{
+
+							parkingId:_this.form.id,
+							parkingType:_this.form.type,
+							cityId:_this.form.city,
+							parkingAddress:_this.form.address,
+							parkingName:_this.form.name,
+							pointLat:_this.form.latitude,
+							pointLng:_this.form.longitude,
+							userId:_this.form.manager,
+							chargeRuleId:_this.form.chargeRuleId,
+							parkingBusType: _this.form.parkingBusType
+
+							/*parkingBusModel:"1",
+							parkingDescription:"selfSupport",
+							parkingBusType: "1",
+							approachNum:0,*/
+							
+							
+						}).then((data) => {
+	        				if(data.status!=200) return;
+				           _this.tableList(_this.curIndex);
 	      				});
 
 					}
@@ -969,7 +1010,55 @@
 					}
 					
 				})
-			}
+			},
+			editPark(item){
+				this.dialogFormVisible = true;
+				this.isEdit = true
+				this.parkingStatus = '修改停车场'
+				this.$nextTick(function(){
+					this.map = new BMap.Map("areaMap"); 
+					this.map.centerAndZoom(new BMap.Point(113.937122, 22.542874), 12);   
+					setMapEvent(this.map);
+					addMapControl(this.map);
+
+					var _this=this;
+					this.map.addEventListener("click", function(e) {
+					    // 创建地理编码服务实例
+					    var myGeo = new BMap.Geocoder();
+					    // 根据坐标得到地址描述
+					    myGeo.getLocation(new BMap.Point(e.point.lng, e.point.lat), function(result) {
+					        if (result) {
+					        	// console.log(result)
+					        	_this.form.address=result.address;
+								_this.form.longitude=result.point.lng;
+								_this.form.latitude=result.point.lat;
+					        }
+
+					    });
+					});
+				});
+
+				this.$postRequest(getParkSingle(),{parkingId:item.parkingId}).then((data) => {
+    				if(data.status!=200) return;
+		            this.form.id=data.data.parkingId;
+		            this.form.name=data.data.parkingName;
+		            this.form.type=data.data.parkingType;
+		            this.form.city=data.data.cityId;
+		            this.form.address=data.data.parkingAddress;
+
+		            this.form.latitude=data.data.pointLat;
+		            this.form.longitude=data.data.pointLng;
+		            this.form.manager=data.data.userId;
+		            this.form.chargeRuleId=data.data.chargeRuleId;
+		            this.form.parkingBusType=data.data.parkingBusType;
+
+		            addMapOverlayl(data.data.pointLat, data.data.pointLng, this.map,);
+							
+					this.map.panTo(new BMap.Point(data.data.pointLng,data.data.pointLat),{noAnimation:true});
+
+  				});
+
+			},
 		},
 		computed:{
 			...mapState({
@@ -983,7 +1072,8 @@
     			this.parklist_btn_add = this.elements['parklist:btn_add'];
     			this.parklist_btn_rule = this.elements['parklist:btn_rule'];
     			this.parklist_btn_pkset = this.elements['parklist:btn_pkset'];
-    			this.parklist_btn_person = this.elements['parklist:btn_person'];
+				this.parklist_btn_person = this.elements['parklist:btn_person'];
+				this.parklist_btn_edit = this.elements['parklist:btn_edit'];
 	    	}
 		},
 		components:{
@@ -1036,9 +1126,9 @@
 	    color: #222;
 	    color: #02c1af;
 	}
-	.boxbgcolor{
-		/deep/ .el-dialog__wrapper{
-			z-index:0 !important
-		}
-	}
+	// .boxbgcolor{
+	// 	/deep/ .el-dialog__wrapper{
+	// 		z-index:0 !important
+	// 	}
+	// }
 </style>
