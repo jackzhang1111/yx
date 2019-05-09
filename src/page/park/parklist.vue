@@ -973,8 +973,8 @@
 
 		        	}]
 		        };
-
 			},
+			//智能提示补全
 			mapStart(){
 				this.$nextTick(function () {
 					var th = this
@@ -1036,6 +1036,7 @@
 
 					    });
 					});
+					this.mapStart()
 				});
 
 				this.$postRequest(getParkSingle(),{parkingId:item.parkingId}).then((data) => {

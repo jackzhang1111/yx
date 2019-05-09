@@ -204,8 +204,9 @@
 				}).then((data) => {
     				if(data.status!=200) return;
 		            this.detailData=data.data;
-		            // this.allImgUrl=data.data.photo.split(';');
-		            this.allImgUrl=['http://slwl-parking.oss-cn-shenzhen.aliyuncs.com/intelligePark/plaNumPhoto/d3192b6-3.jpg','http://slwl-parking.oss-cn-shenzhen.aliyuncs.com/intelligePark/plaNumPhoto/7d255a9-0.jpg'];
+					this.allImgUrl=data.data.photo.split(',');
+					
+		            // this.allImgUrl=['http://slwl-parking.oss-cn-shenzhen.aliyuncs.com/intelligePark/plaNumPhoto/d3192b6-3.jpg','http://slwl-parking.oss-cn-shenzhen.aliyuncs.com/intelligePark/plaNumPhoto/7d255a9-0.jpg'];
 		            this.imgUrl=this.allImgUrl[0];
   				});
 			},
