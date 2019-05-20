@@ -6,7 +6,7 @@
                 <div>
                     <el-upload
                       class="avatar-uploader"
-                      action="http://47.106.143.1:9992/oss/upload"
+                      action="http://47.106.121.213:9992/oss/upload"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :data='{pathName:"itparking/web"}'>

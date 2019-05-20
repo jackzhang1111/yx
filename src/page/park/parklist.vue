@@ -607,7 +607,7 @@
 
 						_this.$postRequest(parkAdd(),{
 
-							parkingId:_this.form.id,
+							parkingId:'',
 							parkingType:_this.form.type,
 							cityId:_this.form.city,
 							parkingAddress:_this.form.address,
@@ -637,10 +637,11 @@
 			editParkTrue(){
 				var _this=this;
 				this.$refs['form'].validate(function(valid,noStri){
-					// console.log(valid)
+					console.log(_this.form)
+					// return
 					if(valid){
 						_this.dialogFormVisible = false;
-
+						
 						_this.$putRequest(parkAdd()+'/'+_this.form.id,{
 
 							parkingId:_this.form.id,
@@ -1000,6 +1001,8 @@
 						map.clearOverlays();    //清除地图上所有覆盖物
 						function myFun(){
 							var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+							th.form.latitude = pp.lat
+							th.form.longitude = pp.lng
 							map.centerAndZoom(pp, 16);
 							map.addOverlay(new BMap.Marker(pp));    //添加标注
 						}
@@ -1012,6 +1015,7 @@
 				})
 			},
 			editPark(item){
+				
 				this.dialogFormVisible = true;
 				this.isEdit = true
 				this.parkingStatus = '修改停车场'

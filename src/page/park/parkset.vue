@@ -400,7 +400,7 @@
 		      		<el-col :span="5" style="margin-left:6px;">
 		      			<el-upload
 						  class="upload-demo"
-						  action="http://47.106.143.1:9992/oss/upload"
+						  action="http://47.106.121.213:9992/oss/upload"
 						  :on-error="handleError"
 						  :on-success="handleSuccess"
 						  :limit="3"
@@ -568,7 +568,7 @@
 		      		<el-col :span="5" style="margin-left:6px;">
 		      			<el-upload
 						  class="upload-demo"
-						  action="http://47.106.143.1:9992/oss/upload"
+						  action="http://47.106.121.213:9992/oss/upload"
 						  :on-error="handleErrorComp"
 						  :on-success="handleSuccessComp"
 						  :limit="3"
@@ -1005,8 +1005,8 @@
 			            { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
 			        ],
 			        sn: [
-						{ required: false},
-						{ pattern: /^[A-Za-z0-9]+$/, message: '请输入数字或者字母' }
+						{ required: true},
+						// { pattern: /^[A-Za-z0-9]+$/, message: '请输入数字或者字母' }
 			        ]
 		        },
 
@@ -1162,9 +1162,9 @@
                     onSuccess: this.onConnect,  
                     onFailure: this.onFailure
                 }; 
-                // this.vueMqtt.client.onConnectionLost = this.onConnectionLost;  
+                this.vueMqtt.client.onConnectionLost = this.onConnectionLost;  
                 
-                // this.vueMqtt.client.onMessageArrived = this.onMessageArrived;
+                this.vueMqtt.client.onMessageArrived = this.onMessageArrived;
 
                 this.vueMqtt.client.connect(options);
 
@@ -1172,7 +1172,7 @@
 
 			onConnect:function(){
 				console.log("connected");
-                this.vueMqtt.client.subscribe(this.vueMqtt.topic);
+				this.vueMqtt.client.subscribe(this.vueMqtt.topic);
 			},
 
 			onFailure:function(){
@@ -1184,12 +1184,12 @@
 			},
 			onMessageArrived:function(message){
 				// console.log(message);
-                // console.log("收到消息:"+message.payloadString);
-                var mqttPd=JSON.parse(message.payloadString) ;
+				// console.log("收到消息:"+message.payloadString);
+				var mqttPd=JSON.parse(message.payloadString) ;
                 if(this.areaInfo.id==mqttPd.data.parkingArea.areaId){
                 	var parkArea=mqttPd.data.parkingArea;
                 	this.initTable(parkArea.width,parkArea.height,mqttPd.data,this.areaInfo.size);
-                }
+				}
 			},
 
 			openDialogEquip:function(){

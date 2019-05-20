@@ -4,7 +4,61 @@
             <el-col :span="24">
                 <div class="rent-con">
                     <el-row>
-                        <el-col :span="12">
+                        <el-tabs v-model="activeName" @tab-click="handleClick" type="card">
+                            <el-tab-pane label="车位冻结" name="first">
+                                <div class="con-left">
+                                    <!-- <div class="title">
+                                        <span>车位冻结</span>
+                                    </div> -->
+                                    <div class="con-content">
+                                        <div class="margin-b-23">
+                                            <span class="red">*</span>
+                                            <span class="txt">冻结次数</span>
+                                            <input v-model="form.freezingTimes" type="text" class="time-input"  @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">
+                                            <span class="txt">次</span>
+                                        </div>
+                                        <div>
+                                            <span class="red">*</span>
+                                            <span class="txt">冻结提前时间</span>
+                                            <input v-model="form.frozenLeadTime" type="text" class="time-input" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">
+                                            <span class="txt">天</span>
+                                        </div>
+                                        <div class="con-bottom">
+                                            <span>冻结条件</span><br/>
+                                            <span>1.每月最多只能冻结{{freezingTimes}}次</span><br/>
+                                            <span>2.再次点击我要冻结，可以解冻</span><br/>
+                                            <span>3.冻结时间到后如果不解冻{{frozenLeadTime}}天后平台自动解冻</span><br/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </el-tab-pane>
+                            <el-tab-pane label="车位注销" name="second">
+                                <div class="con-right">
+                                <!-- <div class="title">
+                                    <span>车位注销</span>
+                                </div> -->
+                                <div class="con-content">
+                                    <div class="margin-b-23">
+                                        <span class="red">*</span>
+                                        <span class="txt">注销次数</span>
+                                        <input v-model="form.cancellationTimes" type="text" class="time-input" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">
+                                        <span class="txt">次</span>
+                                    </div>
+                                    <div>
+                                        <span class="red">*</span>
+                                        <span class="txt">注销提前时间</span>
+                                        <input v-model="form.cancellationLeadTime" type="text" class="time-input" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">
+                                        <span class="txt">天</span>
+                                    </div>
+                                    <div class="con-bottom">
+                                        <span>注销条件</span><br/>
+                                        <span>1.每年注销、申请最多不能超过{{cancellationTimes}}次</span><br/>
+                                    </div>
+                                </div>
+                            </div>
+                            </el-tab-pane>
+                        </el-tabs>
+                        <!-- <el-col :span="12">
                             <div class="con-left">
                                 <div class="title">
                                     <span>车位冻结</span>
@@ -51,7 +105,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </el-col>
+                        </el-col> -->
                     </el-row>
                 </div>
             </el-col>
@@ -66,6 +120,7 @@ import {getSharingRuleReApi,updateSharingRuleApi} from '@/api/regulation/rentOut
 export default {
     data() {
         return {
+            activeName:'first',
             rentout_btn_edit:false,
             form:{
                 freezingTimes:'',//冻结次数
@@ -82,7 +137,7 @@ export default {
         };
     },
     created() {
-
+        this.permiss
     },
     mounted() {
         this.getSharingRuleRe()
@@ -97,6 +152,7 @@ export default {
         getSharingRuleRe(){
             getSharingRuleReApi().then(res => {
                 if(res.status == 200){
+                    if(res.data.rows.length == 0) return
                     this.form = Object.assign({},this.form,res.data.rows[0])
                     this.freezingTimes = res.data.rows[0].freezingTimes
                     this.cancellationTimes = res.data.rows[0].cancellationTimes
@@ -106,6 +162,15 @@ export default {
             })
         },
         submit(){
+            console.log();
+            if(this.form.freezingTimes == '' || this.form.frozenLeadTime == ''){
+                this.$message.error('冻结次数或者冻结提前时间不能为空');
+                return
+            }
+            if(this.form.cancellationLeadTime == '' || this.form.cancellationTimes == ''){
+                this.$message.error('注销次数或者注销提前时间不能为空');
+                return
+            }
             this.loading = true
             this.updateSharingRule()
         },
@@ -123,6 +188,9 @@ export default {
             }).catch(function(error){
                 _this.loading = false
             });
+        },
+        handleClick(){
+            
         }
     },
     components: {
@@ -154,7 +222,18 @@ export default {
         width: 100%;
         overflow: hidden;
         border:1px solid #D2D2D2;
+        border-top:0;
+        border-right:0;
         color: #3F3F3F;
+        /deep/ .el-tabs--card{
+            .is-active{
+                background-color: #02C1AF;
+                color: #fff
+            }
+        }
+        /deep/ .el-tabs__header{
+            margin:0
+        }
     }
     .con-left{
         width: 100%;
@@ -166,6 +245,7 @@ export default {
         width: 100%;
         height:600px;
         float: right;
+        border-right:1px solid #D2D2D2;
     }
     .title{
         width: 100%;
@@ -220,6 +300,9 @@ export default {
     }
     .margin-b-23{
         margin-bottom: 23px;
+    }
+    .red{
+        color: red
     }
 }
 </style>
