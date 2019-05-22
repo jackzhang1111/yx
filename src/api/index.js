@@ -4,7 +4,7 @@ import {mainAxios,parkAxios} from '@/api/http'
 var protocol=window.location.protocol;
 var host=window.location.host;
 var urlHead=protocol+"//"+host;
-var urlLogin=urlHead+'/login/';
+var urlLogin=urlHead+'/api/';
 console.log(urlLogin,'urlLogin');
 function main(params){
     let base = {

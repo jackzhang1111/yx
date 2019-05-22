@@ -13,6 +13,8 @@ import RouteTemp from '../page/commons/routeTemp.vue'
 import ParkList from '../page/park/parklist.vue'
 import ParkSet from '../page/park/parkset.vue'
 import Staff from '../page/park/staff.vue'
+import Cardlist from '../page/park/cardlist.vue'
+import Rangelist from '../page/park/rangelist.vue'
 
 import PlateCheck from '../page/check/platecheck.vue'
 import PrivateSpace from '../page/check/privatespace.vue'
@@ -34,8 +36,10 @@ import Running from '../page/order/running.vue'
 import ConsultList from '../page/consult/consultlist.vue'
 import Edit from '../page/consult/edit2.vue'
 
-//出入口
-import accesssControl from '@/page/access/accesssControl.vue'
+//室内出入口
+import AccesssControl from '@/page/access/accesssControl.vue'
+//路测出入口管理
+import RoadsideControl from '@/page/access/roadsideControl.vue'
 
 //出租规则
 import RentOut from '../page/regulation/rentOut.vue'
@@ -73,6 +77,16 @@ export default new Router({
                 path: '/main/park/staff',
                 name:'人员',
                 component:Staff
+                
+            },{
+                path: '/main/park/cardlist',
+                name:'月卡',
+                component:Cardlist
+                
+            },{
+                path: '/main/park/rangelist',
+                name:'区层',
+                component:Rangelist
                 
             }]
         },{
@@ -139,8 +153,12 @@ export default new Router({
             }]
         },{
             path: '/main/access/accesssControl',
-            name:'出入口',
-            component:accesssControl
+            name:'室内出入口',
+            component:AccesssControl
+        },{
+            path: '/main/access/roadsideControl',
+            name:'路测出入口',
+            component:RoadsideControl
         },{
             path: '/main/regulation/rentOut',
             name:'出租规则',

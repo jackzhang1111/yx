@@ -100,3 +100,7 @@
 .fontcolor{
 	color: #299ceb;
 }
+
+.el-dialog__close.el-icon.el-icon-close{
+	color: #fff
+}

@@ -65,6 +65,12 @@
 					children:[{
 						href:"/main/park/parklist",
 						title:"停车场列表"
+					},{
+						href:"/main/park/cardlist",
+						title:"月卡列表"
+					},{
+						href:"/main/park/rangelist",
+						title:"区层列表"
 					}]
 				},{
 					icon:"./static/images/orderlist.png",
@@ -120,7 +126,10 @@
 					title:"出入口管理",
 					children:[{
 						href:"/main/access/accesssControl",
-						title:"出入口"
+						title:"室内出入口"
+					},{
+						href:"/main/access/roadsideControl",
+						title:"路测出入口"
 					}]
 				},{
 					icon:"./static/images/rentOut.png",
@@ -141,7 +150,7 @@
 				
 				this.$get(menu_url(),{}).then((data) => {
         				
-			            _this.sidearr=data[0].children;
+			            // _this.sidearr=data[0].children;
       				});
 			},
 	        handleOpen:function(key, keyPath) {
