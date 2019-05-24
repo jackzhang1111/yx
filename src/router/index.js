@@ -13,9 +13,12 @@ import RouteTemp from '../page/commons/routeTemp.vue'
 import ParkList from '../page/park/parklist.vue'
 import ParkSet from '../page/park/parkset.vue'
 import Staff from '../page/park/staff.vue'
+//月卡列表
 import Cardlist from '../page/park/cardlist.vue'
+//区层列表
 import Rangelist from '../page/park/rangelist.vue'
-
+//车位列表
+import Carportlist from '../page/park/carportlist.vue'
 import PlateCheck from '../page/check/platecheck.vue'
 import PrivateSpace from '../page/check/privatespace.vue'
 import Freeze from '../page/check/freeze.vue'
@@ -87,6 +90,11 @@ export default new Router({
                 path: '/main/park/rangelist',
                 name:'区层',
                 component:Rangelist
+                
+            },{
+                path: '/main/park/carportlist',
+                name:'车位',
+                component:Carportlist
                 
             }]
         },{

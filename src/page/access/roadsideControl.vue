@@ -53,9 +53,7 @@
                         <td>{{item.end_date}}</td>
                         <td>{{(item.parking_name)}}</td>
                         <td>{{getTime(item.begin_date,item.end_date)}}</td>
-                        <td>
-                            123
-                        </td>
+                        <td>{{item.space_num}}</td>
                     </tr>
                 </tbody>
             </table>

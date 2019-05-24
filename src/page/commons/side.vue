@@ -71,6 +71,9 @@
 					},{
 						href:"/main/park/rangelist",
 						title:"区层列表"
+					},{
+						href:"/main/park/carportlist",
+						title:"车位管理列表"
 					}]
 				},{
 					icon:"./static/images/orderlist.png",
