@@ -52,6 +52,8 @@ export const addEditArea = () =>urlPk+'parking/parkingArea';
 export const addEditSpace = () =>urlPk+'parking/parkingSpace';
 export const getSpaceSingle = () =>urlPk+'parking/parkingSpace/one';
 
+export const addParkingAndChargeRules = () =>urlPk+'parking/parking/addParkingAndChargeRules';
+
 export const addEditIo = () =>urlPk+'parking/parkingIo';
 export const getIoSingle = () =>urlPk+'parking/parkingIo/one';
 

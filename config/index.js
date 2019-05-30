@@ -12,8 +12,8 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
         '/api': {
-            // target:'http://192.168.1.126:8765',  //目标接口域名
-            target: 'https://www.parking.dda-iot.com',  //目标接口域名
+            target:'http://192.168.1.113:8765',  //目标接口域名
+            // target: 'https://www.parking.dda-iot.com',  //目标接口域名
             changeOrigin: true, //是否跨域
             pathRewrite: {
                 '^/api': '/api' //重写接口
@@ -27,8 +27,8 @@ module.exports = {
             }
         },
         '/login': {
-            // target:'http://192.168.1.126:8765',  //目标接口域名
-            target:'https://www.parking.dda-iot.com',  //目标接口域名
+            target:'http://192.168.1.113:8765',  //目标接口域名
+            // target:'https://www.parking.dda-iot.com',  //目标接口域名
             changeOrigin: true, //是否跨域
             pathRewrite: {
                 '^/login': '/api' //重写接口

@@ -34,15 +34,14 @@
                     </tr>
                 </thead>
                 <tbody id="tbody">
-                    <tr v-for="item in tableListData.rows">
+                    <tr v-for="(item,index) in tableListData.rows" :key="index">
                         <td>{{item.crtTime}}</td>
                         <td>{{item.errorType}}</td>
                         <td>{{item.onerankdeSn}}</td>
                         
-                        <!-- <td>{{JSON.parse(item.spaceId).spaceNum}}</td> -->
                         <td>{{item.proceStatus|filterStatus}}</td>
                         <td>
-                            <a class="margin-right" title="查看" href="javascript:;" @click="detail(item.id,JSON.parse(item.spaceId).spaceNum)"><span>详情</span></a>
+                            <a class="margin-right" title="查看" href="javascript:;" @click="detail(item.id,item.parkingSpace.spaceNum)"><span>详情</span></a>
                             <a v-if="item.proceStatus=='running'&&magnetic_btn_deal" title="" href="javascript:;" @click="deal(item.id)"><span>处理</span></a>
                             <a v-else-if="magnetic_btn_deal" title="" href="javascript:;"><span class="fontgay">处理</span></a>
                         </td>

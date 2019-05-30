@@ -29,7 +29,7 @@
                     <tr v-for="(item,index) in tableListData.rows" :key="index">
                         <td>{{item.parkingName}}</td>
                         <td>{{item.parkingType}}</td>
-                        <td>{{JSON.parse(item.userId).username}}</td>
+                        <td>{{item.user.username}}</td>
                         <td>{{item.crtTime}}</td>
                         <td>{{item.parkingAddress}}</td>
                         
@@ -53,7 +53,7 @@
 		</div>
 		
 
-		<!-- 添加停车场 -->
+		<!-- 修改停车场 -->
 		<el-dialog :title="parkingStatus" :visible.sync="dialogFormVisible" width="900px"  @open="openDialog" @close="closeDialog">
 			<div class="clearfix">
 				<el-form class="fl" style="width:45%;" ref="form" label-position="right" :model="form" :rules="rules" :label-width="formLabelWidth" id="form">
@@ -148,6 +148,228 @@
 		  	<div slot="footer" class="dialog-footer">
 		    	<el-button @click="dialogFormVisible = false">取 消</el-button>
 		    	<el-button type="primary" @click="addrOrEditTrue">确 定</el-button>
+		  	</div>
+		</el-dialog>
+
+		<!-- 添加停车场 -->
+		<el-dialog :title="parkingStatus" :visible.sync="addDialogFormVisible" width="900px"  @open="openDialog" @close="closeDialog">
+			<el-steps :active="active" finish-status="success" align-center>
+				<el-step title="创建停车场"></el-step>
+				<el-step title="设置收费规则"></el-step>
+			</el-steps>
+			<div class="clearfix" v-show="this.active == 0">
+				<el-form class="fl" style="width:45%;" ref="form" label-position="right" :model="form" :rules="rules" :label-width="formLabelWidth" id="form">
+					<el-form-item label="城市" prop="city">
+			    		<el-col :span="18">
+			      			<el-select @change="changeCity" filterable v-model="form.city" placeholder="请选择">
+							    <el-option
+							      v-for="item in allCity"
+							      :key="item.value"
+							      :label="item.name"
+							      :value="item.id">
+							    </el-option>
+							  </el-select>
+			      		</el-col>
+			      	</el-form-item>
+					
+					<el-form-item label="管理员" prop="manager">
+			    		<el-col :span="18">
+			      			<el-select filterable v-model="form.manager" placeholder="请选择">
+							    <el-option
+							      v-for="item in allManager"
+							      :key="item.index"
+							      :label="item.username"
+							      :value="item.id">
+							    </el-option>
+							  </el-select>
+			      		</el-col>
+			      	</el-form-item>
+
+			    	<el-form-item label="车场名称" prop="name">
+			    		<el-col :span="18">
+			      			<el-input v-model.trim="form.name" auto-complete="off" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"></el-input>
+			      		</el-col>
+			      	</el-form-item>
+					
+					<el-form-item label="车场地址" prop="address">
+						<el-col :span="18">
+			      			<el-input v-model="form.address" auto-complete="off" @keyup.enter.native="searchMap" id="suggestId"></el-input>
+			      		</el-col>
+			    	</el-form-item>
+
+			      	<el-form-item label="车场类型">
+			    		<el-col :span="18">
+			      			<el-select v-model="form.type" placeholder="请选择">
+							    <el-option
+							      v-for="item in allType"
+							      :key="item.index"
+							      :label="item.labelZhCh"
+							      :value="item.value">
+							    </el-option>
+							  </el-select>
+			      		</el-col>
+			      	</el-form-item>
+
+			      	
+					
+					<el-form-item label="收费规则">
+			    		<el-col :span="18">
+			      			<el-select v-model="form.chargeRuleId" placeholder="请选择">
+							    <el-option
+							      v-for="item in allChargeRuleSel"
+							      :key="item.index"
+							      :label="item.name"
+							      :value="item.id">
+							    </el-option>
+							  </el-select>
+			      		</el-col>
+			      	</el-form-item>
+
+			      	<el-form-item label="业务流程">
+			    		<el-col :span="18">
+			      			<el-select v-model="form.parkingBusType" placeholder="请选择">
+							    <el-option
+							      v-for="item in allParkingBusType"
+							      :key="item.index"
+							      :label="item.businessName"
+							      :value="item.id">
+							    </el-option>
+							  </el-select>
+			      		</el-col>
+			      	</el-form-item>
+					
+				</el-form>
+
+				<div class="fr" id="areaMap" style="width: 52%;height: 380px;"></div>
+
+		  	</div>
+			<div v-show="this.active == 1">
+				<el-form ref="formRule" label-position="right" :label-width="formLabelWidth">
+					<!-- 室内 3-->
+					<table v-if="matchRuleStype" class="table-rule">
+						<tr>
+							<td rowspan="3">小车</td>
+							<td rowspan="2">工作日</td>
+							<td>
+								<el-time-picker
+									:editable="false"
+								    is-range
+								    v-model="formRule.params[0].StartOrEndTime"
+								    value-format="HH:mm" 
+								    format="HH:mm"
+								    range-separator="-"
+								    start-placeholder=""
+								    end-placeholder=""
+								    placeholder="">
+								</el-time-picker>
+
+							</td>
+							<td>首小时<input v-model="formRule.params[0].firstPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元,首小时后<input v-model="formRule.params[0].firstHoursPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/半小时</td>
+						</tr>
+						<tr>
+							<td>
+								{{formRule.params[0].StartOrEndTime[1]}} - 次日 {{formRule.params[0].StartOrEndTime[0]}}
+							</td>
+							<td><input v-model="formRule.params[0].odLastPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/时</td>
+						</tr>
+						<tr>
+							<td>非工作日</td>
+							<td colspan="2">首小时<input v-model="formRule.params[0].tdPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元,首小时后<input v-model="formRule.params[0].tdHoursPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/半小时</td>
+						</tr>
+
+						<tr>
+							<td rowspan="3">大车</td>
+							<td rowspan="2">工作日</td>
+							<td>
+								{{formRule.params[0].StartOrEndTime[0]}} - {{formRule.params[0].StartOrEndTime[1]}}
+							</td>
+							<td>首小时<input v-model="formRule.params[1].firstPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元,首小时后<input v-model="formRule.params[1].firstHoursPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/半小时</td>
+						</tr>
+						<tr>
+							<td>
+								{{formRule.params[0].StartOrEndTime[1]}} - 次日 {{formRule.params[0].StartOrEndTime[0]}}
+							</td>
+							<td><input v-model="formRule.params[1].odLastPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/时</td>
+						</tr>
+						<tr>
+							<td>非工作日</td>
+							<td colspan="2">首小时<input v-model="formRule.params[1].tdPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元,首小时后<input v-model="formRule.params[1].tdHoursPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/半小时</td>
+						</tr>
+
+						<tr>
+							<td>共享</td>
+							<td></td>
+							<td>
+								<el-time-picker
+									:editable="false"
+								    is-range
+								    v-model="formRule.params[2].StartOrEndTime"
+								    value-format="HH:mm" 
+								    format="HH:mm"
+								    range-separator="-"
+								    start-placeholder=""
+								    end-placeholder=""
+								    placeholder="">
+								</el-time-picker>
+							</td>
+							<td>首小时<input v-model="formRule.params[2].firstPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元,首小时后<input v-model="formRule.params[2].firstHoursPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/半小时（超出共享时段<input v-model="formRule.params[2].odLastPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/时）</td>
+						</tr>
+						<tr>
+							<td colspan="4" style="text-align: left;">说明：进场<input v-model="formRule.freeTime" type="text" class="time-input" maxlength="3" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">分钟内免费;
+								<div>
+									月卡：小车<input v-model="formRule.params[0].monthsCardPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/月&nbsp;&nbsp;大车<input v-model="formRule.params[1].monthsCardPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元/月&nbsp;&nbsp;开关：<el-switch v-model="formRule.openFlag" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+								</div>
+							</td>
+						</tr>
+					</table>
+					
+					<!-- 路侧 1-->
+					<table v-else class="table-rule">
+						<tr>
+							<td rowspan="2">小车</td>
+							<td>工作日</td>
+							<td>
+								<el-time-picker
+									:editable="false"
+								    is-range
+								    v-model="formRuleOne.params[0].wdStartOrEndTime"
+								    value-format="HH:mm" 
+								    format="HH:mm"
+								    range-separator="-"
+								    start-placeholder=""
+								    end-placeholder=""
+								    placeholder="">
+								</el-time-picker>
+							</td>
+							<td>首<input v-model="formRuleOne.params[0].wdAfterHourF" type="text" class="time-input" maxlength="3" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">小时<input v-model="formRuleOne.params[0].wdFirstPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元，{{formRuleOne.params[0].wdAfterHourF}} - {{formRuleOne.params[0].wdLastHour}} 小时<input v-model="formRuleOne.params[0].wdAfterPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元，<input v-model="formRuleOne.params[0].wdLastHour" type="text" class="time-input" maxlength="3" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">小时后<input v-model="formRuleOne.params[0].wdLastPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元</td>
+						</tr>
+						<tr>
+							<td>非工作日</td>
+							<td>
+								<el-time-picker
+									:editable="false"
+								    is-range
+								    v-model="formRuleOne.params[0].odStartOrEndTime"
+								    value-format="HH:mm" 
+								    format="HH:mm"
+								    range-separator="-"
+								    start-placeholder=""
+								    end-placeholder=""
+								    placeholder="">
+								</el-time-picker>
+							</td>
+							<td>首<input v-model="formRuleOne.params[0].odAfterHourF" type="text" class="time-input" maxlength="3" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">小时<input v-model="formRuleOne.params[0].odFirstPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元，{{formRuleOne.params[0].odAfterHourF}} - {{formRuleOne.params[0].odLastHour}} 小时<input v-model="formRuleOne.params[0].odAfterPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元，<input v-model="formRuleOne.params[0].odLastHour" type="text" class="time-input" maxlength="3" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">小时后<input v-model="formRuleOne.params[0].odLastPrice" type="text" class="money-input" maxlength="5" @keyup="handleKeyup($event)" @afterpaste="handleAfterpaste($event)">元</td>
+						</tr>
+						<tr>
+							<td colspan="4" style="text-align: left;">说明：进场<input v-model="formRuleOne.freeTime" type="text" class="time-input" maxlength="3" @keyup="handleKeyupTime($event)" @afterpaste="handleAfterpasteTime($event)">分钟内免费收费规则（元/半小时）</td>
+						</tr>
+					</table>
+
+				</el-form>
+		  	</div>
+		  	<div slot="footer" class="dialog-footer">
+		    	<el-button @click="last">{{lastName}}</el-button>
+		    	<el-button type="primary" @click="next">{{nextName}}</el-button>
 		  	</div>
 		</el-dialog>
 
@@ -290,7 +512,7 @@
 <script>
 	import { mapState, mapMutations,mapGetters } from 'vuex';
 
-	import {parkingBusType,dictValue,getCity,parkList,getRulesType,addOrUpdateChargeRule,getChargeRule,parkAdd,addMapOverlay,addMapOverlayl,getParkSingle,setMapEvent,addMapControl,getManagerList} from '../../api/url';
+	import {parkingBusType,dictValue,getCity,parkList,getRulesType,addOrUpdateChargeRule,getChargeRule,parkAdd,addMapOverlay,addMapOverlayl,getParkSingle,setMapEvent,addMapControl,getManagerList,addParkingAndChargeRules} from '../../api/url';
 
 	import Page from '../commons/page.vue';
 	
@@ -305,7 +527,7 @@
 				parklist_btn_edit:false,
 
 				isEdit:false,//是否点击停车场修改
-				parkingStatus:'添加停车场',
+				parkingStatus:'创建停车场',
 				search:{
 					pageNumber:1,
 					pageSize:15,
@@ -369,7 +591,8 @@
 		        map:{},
 
 		        dialogFormVisibleRule: false,
-		        matchRuleStype:false,
+				matchRuleStype:false,
+				addDialogFormVisible:false,
 		        // 室内3
 		        formRule:{
 		        	chargeRuleId:'',
@@ -441,8 +664,9 @@
 		        		odFreeMin:''
 
 		        	}]
-		        }
-		        
+		        },
+				active: 0,
+				chargeRule:{}
 			}
 		},
 		methods:{
@@ -559,9 +783,9 @@
 				this.$router.push({path:'/main/park/staff',query:{id:parkId,name:parkName}});
 			},
 			addrOrEdit:function(id){
-				this.dialogFormVisible=true;
+				this.addDialogFormVisible=true;
 				this.isEdit = false
-				this.parkingStatus = '添加停车场'
+				this.parkingStatus = '创建停车场'
 				this.$nextTick(function(){
 					this.map = new BMap.Map("areaMap"); 
 					this.map.centerAndZoom(new BMap.Point(113.937122, 22.542874), 12);   
@@ -597,9 +821,17 @@
 				if(this.isEdit){
 					this.editParkTrue()
 					return
+				}else{
+					//点击确定弹出收费规则框(今天)
+					let chargeRuleId = this.form.chargeRuleId 
+					this.dialogFormVisibleRule=true;
+					if(chargeRuleId=='3'){
+						this.matchRuleStype=true;
+					}else if(chargeRuleId=='1'){
+						this.matchRuleStype=false;
+					}
 				}
 				var _this=this;
-
 				this.$refs['form'].validate(function(valid,noStri){
 					// console.log(valid)
 					if(valid){
@@ -637,8 +869,6 @@
 			editParkTrue(){
 				var _this=this;
 				this.$refs['form'].validate(function(valid,noStri){
-					console.log(_this.form)
-					// return
 					if(valid){
 						_this.dialogFormVisible = false;
 						
@@ -690,14 +920,12 @@
 			openDialog:function(){},
 			closeDialog:function(){
 				this.$refs['form'].resetFields();
+				this.active = 0
 			},
 			getChargeRule:function(parkId,objCharge){
 				this.dialogFormVisibleRule=true;
 				// console.log(parkId,objCharge);
-				var chargeRuleId=JSON.parse(objCharge).id;
-
-				
-
+				var chargeRuleId = objCharge;
 				if(chargeRuleId=='3'){
 					this.matchRuleStype=true;
 					this.formRule.chargeRuleId=chargeRuleId;
@@ -769,7 +997,6 @@
 					this.formRule.params.forEach(item => {
 						if(item.firstPrice == '' || item.firstHoursPrice == '' || item.odLastPrice == ''){
 							flag = false
-							console.log(item);
 						}
 					})
 					if(flag){
@@ -778,6 +1005,7 @@
 						this.$message.warning('请填写正确的收费规则');
 						return
 					}
+					
 					this.$postRequest(addOrUpdateChargeRule(),{
 						chargeRuleId:this.formRule.chargeRuleId,
 						params:[{
@@ -1064,6 +1292,173 @@
   				});
 
 			},
+			//下一步
+			next(){
+				let _this = this
+				if (this.active > 0) {
+					let obj = {
+						parking:{
+							parkingId:'',
+							parkingType:_this.form.type,
+							cityId:_this.form.city,
+							parkingAddress:_this.form.address,
+							parkingName:_this.form.name,
+							pointLat:_this.form.latitude,
+							pointLng:_this.form.longitude,
+							userId:_this.form.manager,
+							chargeRuleId:_this.form.chargeRuleId,
+							parkingBusType: _this.form.parkingBusType
+						},
+						chargeRule:this.chargeRule
+					}
+					if(this.matchRuleStype){
+						let flag = true
+						this.formRule.params.forEach(item => {
+							if(item.firstPrice == '' || item.firstHoursPrice == '' || item.odLastPrice == ''){
+								flag = false
+							}
+						})
+						if(flag){
+							this.chargeRule = {
+								chargeRuleId:obj.parking.chargeRuleId,
+								params:[
+									{
+										parkingId:this.formRule.parkingId,
+										freeTime:this.formRule.freeTime,
+										carType:this.formRule.params[0].carType,
+										lrId:this.formRule.params[0].lrId,
+										openFlag:this.formRule.openFlag?'y':'n',
+										monthsCardPrice:this.formRule.params[0].monthsCardPrice,
+										firstStartTime:this.formRule.params[0].StartOrEndTime[0],
+										firstEndTime:this.formRule.params[0].StartOrEndTime[1],
+										odStartTime:this.formRule.params[0].StartOrEndTime[1],
+										odEndTime:this.formRule.params[0].StartOrEndTime[0],
+										firstHours:'1',
+										firstPrice:this.formRule.params[0].firstPrice,
+										firstHoursPrice:this.formRule.params[0].firstHoursPrice,
+										odLastPrice:this.formRule.params[0].odLastPrice,
+										tdHours:'1',
+										tdPrice:this.formRule.params[0].tdPrice,
+										tdHoursPrice:this.formRule.params[0].tdHoursPrice
+									},
+									{
+										parkingId:this.formRule.parkingId,
+										freeTime:this.formRule.freeTime,
+										carType:this.formRule.params[1].carType,
+										lrId:this.formRule.params[1].lrId,
+										openFlag:this.formRule.openFlag?'y':'n',
+										monthsCardPrice:this.formRule.params[1].monthsCardPrice,
+										firstStartTime:this.formRule.params[0].StartOrEndTime[0],
+										firstEndTime:this.formRule.params[0].StartOrEndTime[1],
+										odStartTime:this.formRule.params[0].StartOrEndTime[1],
+										odEndTime:this.formRule.params[0].StartOrEndTime[0],
+										firstHours:'1',
+										firstPrice:this.formRule.params[1].firstPrice,
+										firstHoursPrice:this.formRule.params[1].firstHoursPrice,
+										odLastPrice:this.formRule.params[1].odLastPrice,
+										tdHours:'1',
+										tdPrice:this.formRule.params[1].tdPrice,
+										tdHoursPrice:this.formRule.params[1].tdHoursPrice
+									},
+									{
+										parkingId:this.formRule.parkingId,
+										freeTime:this.formRule.freeTime,
+										carType:this.formRule.params[2].carType,
+										lrId:this.formRule.params[2].lrId,
+										firstStartTime:this.formRule.params[2].StartOrEndTime[0],
+										firstEndTime:this.formRule.params[2].StartOrEndTime[1],
+										odStartTime:this.formRule.params[2].StartOrEndTime[1],
+										odEndTime:this.formRule.params[2].StartOrEndTime[0],
+										firstHours:'1',
+										firstPrice:this.formRule.params[2].firstPrice,
+										firstHoursPrice:this.formRule.params[2].firstHoursPrice,
+										odLastPrice:this.formRule.params[2].odLastPrice
+									}
+								]
+							}
+							obj.chargeRule = this.chargeRule
+							
+						}else{
+							this.$message.warning('请填写正确的收费规则');
+							return
+						}
+						this.$postRequest(addParkingAndChargeRules(),obj).then((res) => {
+							if(res.status == 200){
+								this.addDialogFormVisible = false
+								this.tableList(this.curIndex);
+							}
+						})
+					}else{
+						let formParams = this.formRuleOne.params[0]
+						if(formParams.wdAfterHourF && formParams.wdFirstPrice && formParams.wdAfterPrice && formParams.wdLastHour && formParams.wdLastPrice && formParams.odAfterHourF && formParams.odFirstPrice &&formParams.odAfterPrice && formParams.odLastHour){
+							//路测所有验证没有问题
+							this.chargeRule = {
+								chargeRuleId:obj.parking.chargeRuleId,
+								params:[
+									{
+										parkingId:this.formRuleOne.parkingId,
+										carType:this.formRuleOne.params[0].carType,
+										lrId:this.formRuleOne.params[0].lrId,
+										wdStartTime:this.formRuleOne.params[0].wdStartOrEndTime[0],
+										wdEndTime:this.formRuleOne.params[0].wdStartOrEndTime[1],
+										wdAfterHourF:this.formRuleOne.params[0].wdAfterHourF,
+										wdFirstHour:this.formRuleOne.params[0].wdAfterHourF,
+										wdAfterHourL:this.formRuleOne.params[0].wdLastHour,
+										wdLastHour:this.formRuleOne.params[0].wdLastHour,
+										wdFirstPrice:this.formRuleOne.params[0].wdFirstPrice,
+										wdAfterPrice:this.formRuleOne.params[0].wdAfterPrice,
+										wdLastPrice:this.formRuleOne.params[0].wdLastPrice,
+										wdFreeMin:this.formRuleOne.freeTime,
+										odStartTime:this.formRuleOne.params[0].odStartOrEndTime[0],
+										odEndTime:this.formRuleOne.params[0].odStartOrEndTime[1],
+										odAfterHourF:this.formRuleOne.params[0].odAfterHourF,
+										odFirstHour:this.formRuleOne.params[0].odAfterHourF,
+										OdAfterHourlL:this.formRuleOne.params[0].odLastHour,
+										odLastHour:this.formRuleOne.params[0].odLastHour,
+										odFirstPrice:this.formRuleOne.params[0].odFirstPrice,
+										odAfterPrice:this.formRuleOne.params[0].odAfterPrice,
+										odLastPrice:this.formRuleOne.params[0].odLastPrice,
+										odFreeMin:this.formRuleOne.freeTime
+									}
+								]
+							}
+							obj.chargeRule = this.chargeRule
+						}else{
+							this.$message.warning('请填写正确的收费规则');
+							return
+						}
+						this.$postRequest(addParkingAndChargeRules(),obj).then((res) => {
+							if(res.status == 200){
+								this.addDialogFormVisible = false
+								this.tableList(this.curIndex);
+							}
+						})
+					}
+					
+				}else{
+					let chargeRuleId = this.form.chargeRuleId 
+					if(chargeRuleId=='3'){
+						this.matchRuleStype=true;
+					}else if(chargeRuleId=='1'){
+						this.matchRuleStype=false;
+					}
+					this.$refs['form'].validate(function(valid,noStri){
+						if(valid){
+							_this.active++
+						}
+					})
+					
+				}
+				
+			},
+			//上一步
+			last(){
+				if(this.active == 0){
+					this.addDialogFormVisible = false
+				}else{
+					this.active--
+				}
+			}
 		},
 		computed:{
 			...mapState({
@@ -1079,7 +1474,13 @@
     			this.parklist_btn_pkset = this.elements['parklist:btn_pkset'];
 				this.parklist_btn_person = this.elements['parklist:btn_person'];
 				this.parklist_btn_edit = this.elements['parklist:btn_edit'];
-	    	}
+			},
+			nextName(){
+				return this.active == 0 ? "下一步":"确 定"
+			},
+			lastName(){
+				return this.active == 0 ? "取 消":"上一步"
+			}
 		},
 		components:{
 			Page

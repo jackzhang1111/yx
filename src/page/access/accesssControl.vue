@@ -48,10 +48,10 @@
                 <tbody class="tbody">
                     <tr v-for="(item,index) in dataList" :key="index">
                         <td>{{item.crtTime}}</td>
-                        <td>{{JSON.parse(item.plateId).carNumber}}</td>
+                        <td>{{item.plate.carNumber}}</td>
                         <td>{{item.accDate}}</td>
                         <td>{{item.gououtDate}}</td>
-                        <td>{{JSON.parse(item.parkingId).parkingName}}</td>
+                        <td>{{item.parking.parkingName}}</td>
                         <td>{{getTime(item.accDate,item.gououtDate)}}</td>
                         <td>
                             <a title="查看" href="javascript:;" ><span @click="showDetails(item)">详情</span></a>
@@ -182,8 +182,8 @@ export default {
         showDetails(item){
             this.dialogFormVisiblePhoto = true
             this.itemDetail = item
-            this.itemAccinId = JSON.parse(this.itemDetail.accinId)
-            this.itemExitId = this.itemDetail.exitId ? JSON.parse(this.itemDetail.exitId):{}
+            this.itemAccinId = this.itemDetail.accinParkingIo
+            this.itemExitId = this.itemDetail.exitId ? this.itemDetail.exitParkingIo:{}
         },
     },
     components: {

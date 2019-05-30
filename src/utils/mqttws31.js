@@ -967,6 +967,7 @@ Paho.MQTT = (function (global) {
 	};
 
 	ClientImpl.prototype._doConnect = function (wsurl) { 	        
+		console.log(wsurl,'wsurl');
 		// When the socket is open, this client will send the CONNECT WireMessage using the saved parameters. 
 		if (this.connectOptions.useSSL) {
 		    var uriParts = wsurl.split(":");
@@ -1050,7 +1051,7 @@ Paho.MQTT = (function (global) {
 	ClientImpl.prototype.restore = function(key) {    	
 		var value = localStorage.getItem(key);
 		var storedMessage = JSON.parse(value);
-		
+		console.log(value,'value');
 		var wireMessage = new WireMessage(storedMessage.type, storedMessage);
 		
 		switch(storedMessage.type) {
@@ -1598,7 +1599,11 @@ Paho.MQTT = (function (global) {
 				throw new Error(format(ERROR.INVALID_TYPE, [typeof path, "path"]));
 			
 			var ipv6AddSBracket = (host.indexOf(":") != -1 && host.slice(0,1) != "[" && host.slice(-1) != "]");
-			uri = "ws://"+(ipv6AddSBracket?"["+host+"]":host)+":"+port+path;
+			//待验证
+			location.protocol === 'https' ? uri = "wss://"+(ipv6AddSBracket?"["+host+"]":host)+":"+port+path : uri = "ws://"+(ipv6AddSBracket?"["+host+"]":host)+":"+port+path
+			console.log(location.protocol,uri,'uri');
+			// uri = "ws://"+(ipv6AddSBracket?"["+host+"]":host)+":"+port+path;
+			
 		}
 
 		var clientIdLength = 0;
@@ -1789,7 +1794,10 @@ Paho.MQTT = (function (global) {
 						var port = connectOptions.ports[i];
 						
 						var ipv6 = (host.indexOf(":") != -1);
-						uri = "ws://"+(ipv6?"["+host+"]":host)+":"+port+path;
+						//待验证
+						location.protocol === 'https' ? uri = "wss://"+(ipv6?"["+host+"]":host)+":"+port+path : uri = "ws://"+(ipv6?"["+host+"]":host)+":"+port+path
+						console.log(location.protocol,uri,'uri');
+						// uri = "ws://"+(ipv6?"["+host+"]":host)+":"+port+path;
 						connectOptions.uris.push(uri);
 					}
 				} else {

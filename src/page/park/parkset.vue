@@ -1005,7 +1005,7 @@
 			            { min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
 			        ],
 			        sn: [
-						{ required: true},
+						{ required: true,message: '请填写sn', trigger: 'blur'},
 						// { pattern: /^[A-Za-z0-9]+$/, message: '请输入数字或者字母' }
 			        ]
 		        },
@@ -1183,7 +1183,7 @@
 				setTimeout(this.MQTTconnect, this.vueMqtt.reconnectTimeout);
 			},
 			onMessageArrived:function(message){
-				// console.log(message);
+				console.log(message,'message');
 				// console.log("收到消息:"+message.payloadString);
 				var mqttPd=JSON.parse(message.payloadString) ;
                 if(this.areaInfo.id==mqttPd.data.parkingArea.areaId){
@@ -1202,7 +1202,6 @@
 			getsPaceBindEquip:function(node,data){
 				this.mapOrBind=false;
 				console.log(node,data);
-				// console.log(data);
 				if(data.type=='space'){
 					this.$get(getSpaceBindEquip()+'/'+data.id).then((data) => {
 						this.spaceEquipList=data.data.sceneDevList;
@@ -2055,13 +2054,11 @@
 		  				});
 
 					}else{
-						this.parkInfo=JSON.parse(result[0].parkingId);
-
+						this.parkInfo=result[0].parking
 						itemOne.onlyId='1_0';
 						itemOne.id=this.parkInfo.parkingId;
 						itemOne.label=this.parkInfo.parkingName;
 					}
-					
 					for(var j=0;j<result.length;j++){
 						
 						itemTwo={
@@ -2433,11 +2430,13 @@
 						this.qrCodeBtn=true;
 
 						this.$postRequest(getSpaceSingle(),{spaceId:componentId}).then((data) => {
-		    				if(data.status!=200) return;
+							if(data.status!=200) return;
 				            this.formBase.id=data.data.spaceId;
 				            this.formBase.name=data.data.spaceNum;
 				            
-				            this.formBase.toward=data.data.toward;
+							this.formBase.toward=data.data.toward;
+
+							this.formSpace.userId=data.data.userId;
 				            // this.formBase.angle=data.data.angle;
 		  				});
 					}else if(componentType=='2'){
@@ -2452,7 +2451,6 @@
 				            
 		  				});
 					}else if(componentType=='99'){
-						console.log(this)
 						this.towardAndAngle=false;
 						this.qrCodeBtn=false;
 
@@ -2531,8 +2529,8 @@
 						spaceId:this.formBase.id,
 
 						abscissa:0,
-						ordinate:0
-
+						ordinate:0,
+						userId: this.formSpace.userId
 					}).then((data) => {
         				if(data.status!=200) return;
 			            this.getMapInfo(this.areaInfo,true);

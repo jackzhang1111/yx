@@ -54,10 +54,10 @@
                     </tr>
                 </thead>
                 <tbody id="tbody">
-                    <tr v-for="item in tableListData.rows">
+                    <tr v-for="(item,index) in tableListData.rows" :key="index">
                         <td>{{item.crtTime}}</td>
                         <td>{{item.carNumber}}</td>
-                        <td>{{JSON.parse(item.userId).name}}</td>
+                        <td>{{item.appUser.name}}</td>
                         
                         
                         <td>

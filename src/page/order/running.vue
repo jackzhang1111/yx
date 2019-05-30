@@ -58,14 +58,12 @@
                     <tr v-for="(item,index) in tableListData.rows" :key='index'>
                         <td>{{item.orderNum}}</td>
                         <td>{{item.orderType}}</td>
-                        <!-- <td>{{item.plaId.indexOf('{')==-1?'':JSON.parse(item.plaId).carNumber}}</td> -->
-                        <td>{{!item.plaId?'':JSON.parse(item.plaId).carNumber}}</td>
-                        <td>{{!item.spaceId?'':JSON.parse(item.spaceId).spaceNum}}</td>
-                        
+                        <td>{{!item.plate?'':item.plate.carNumber}}</td>
+                        <td>{{!item.space?'':item.space.spaceNum}}</td>
                         <td>{{item.beginDate}}</td>
                         <td>{{item.endDate}}</td>
                         <td>{{item.realMoney}}</td>
-                        <td>{{!item.parkingId?'':JSON.parse(item.parkingId).parkingName}}</td>
+                        <td>{{!item.parking?'':item.parking.parkingName}}</td>
                     </tr>
                 </tbody>
             </table>

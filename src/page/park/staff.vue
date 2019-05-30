@@ -28,10 +28,10 @@
 	                </tr>
             	</thead>
             	<tbody>
-	                <tr v-if="JSON.parse(subItem.userId).departId==item.id" v-for="(subItem,subIndex) in tableListData.userParking">
-	                    <td>{{JSON.parse(subItem.userId).username}}</td>
-	                    <td>{{JSON.parse(subItem.userId).name}}</td>
-	                    <td>{{JSON.parse(subItem.userId).attr1}}</td>
+	                <tr v-if="subItem.user.departId==item.id" v-for="(subItem,subIndex) in tableListData.userParking">
+	                    <td>{{subItem.user.username}}</td>
+	                    <td>{{subItem.user.name}}</td>
+	                    <td>{{subItem.user.attr1}}</td>
 	                    <td>
 	                    	<button @click="unBindUser(subItem.fpId)" type="button" class="btn btn-default del">解绑</button>
 	                    </td>
