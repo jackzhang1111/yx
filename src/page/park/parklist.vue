@@ -374,7 +374,7 @@
 		</el-dialog>
 
 		<!-- 收费规则 -->
-		<el-dialog title="收费规则" :visible.sync="dialogFormVisibleRule" width="600px"  @open="openDialogRule" @close="closeDialogRule">
+		<el-dialog title="收费规则" :visible.sync="dialogFormVisibleRule" width="900px"  @open="openDialogRule" @close="closeDialogRule">
 			<div>
 				<el-form ref="formRule" label-position="right" :label-width="formLabelWidth">
 					<!-- 室内 3-->
@@ -666,18 +666,32 @@
 		        	}]
 		        },
 				active: 0,
-				chargeRule:{}
+				chargeRule:{},
+				cityPointX:null,
+				cityPointY:null
 			}
 		},
 		methods:{
 			...mapMutations(['getPage','storageScenId']),
 			changeCity:function(val){
 				let obj = {};  
+				let _this = this
 			    obj = this.allCity.find((item)=>{ 
-			    return item.id === val;
+			    	return item.id === val;
 			    });  
-			    // console.log(obj.name);
 				this.map.centerAndZoom(obj.name,12);
+				
+				let myGeo = new BMap.Geocoder();
+				
+				// 将地址解析结果显示在地图上,并调整地图视野
+				myGeo.getPoint(obj.name, function(point){
+					if (point) {
+						_this.cityPointX = point.lng
+						_this.cityPointY = point.lat
+						_this.mapStart()
+						
+					}
+				});
 			},
 			handleKeyup:function(e){
 				e.target.value=e.target.value.replace(/[ !`~\!@#\$%\^&\*()_+=\-\;\:\"\'\\/?,<>|\A-Za-z\u4e00-\u9fa5]+/g,'')
@@ -807,7 +821,7 @@
 
 					    });
 					});
-					this.mapStart()
+					// this.mapStart()
 				});
 
 				if(Boolean(id)){
@@ -1210,7 +1224,7 @@
 					// 创建Map实例
 					var map = this.map
 					// 初始化地图,设置中心点坐标，
-					var point = new BMap.Point(114.064552,22.548457);
+					var point = new BMap.Point(this.cityPointX,this.cityPointY);
 					map.centerAndZoom(point, 18);
 					map.enableScrollWheelZoom();
 					var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
@@ -1242,11 +1256,13 @@
 					
 				})
 			},
+			//修改停车场信息
 			editPark(item){
-				
 				this.dialogFormVisible = true;
 				this.isEdit = true
 				this.parkingStatus = '修改停车场'
+				this.cityPointX = item.pointLng
+				this.cityPointY = item.pointLat
 				this.$nextTick(function(){
 					this.map = new BMap.Map("areaMap"); 
 					this.map.centerAndZoom(new BMap.Point(113.937122, 22.542874), 12);   

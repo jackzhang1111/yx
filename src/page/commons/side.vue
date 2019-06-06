@@ -153,7 +153,7 @@
 				
 				this.$get(menu_url(),{}).then((data) => {
         				
-			            // _this.sidearr=data[0].children;
+			            _this.sidearr=data[0].children;
       				});
 			},
 	        handleOpen:function(key, keyPath) {

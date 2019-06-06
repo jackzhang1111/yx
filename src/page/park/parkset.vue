@@ -27,8 +27,9 @@
 				<!-- 场区 -->
 					<div class="item-area" :class="{dn:command!='1'}">
 						<div class="public_list" id="i_area">
-							<el-tree :data="dataArea" :props="defaultProps" @node-click="getMapInfo" node-key="onlyId" :highlight-current="true" :default-expand-all="false" :show-checkbox="false" :default-expanded-keys="['1_0']">
+							<el-tree :data="dataArea" :props="defaultProps" @node-click="getMapInfo" node-key="onlyId" :highlight-current="true" :default-expand-all="false" :show-checkbox="false" :default-expanded-keys="['1_0']" :current-node-key ="areaNodeKey" v-if="showTree">
 								<span class="" slot-scope="{ node, data }">
+									
 									<span class="tree-label">{{ node.label}}</span>
 								    <span>
 								        <el-button v-if="data.level==2&&parkset_btn_editArea"
@@ -400,7 +401,7 @@
 		      		<el-col :span="5" style="margin-left:6px;">
 		      			<el-upload
 						  class="upload-demo"
-						  action="http://47.106.121.213:9992/oss/upload"
+						  action="https://www.parking.dda-iot.com/img/oss/upload"
 						  :on-error="handleError"
 						  :on-success="handleSuccess"
 						  :limit="3"
@@ -568,7 +569,7 @@
 		      		<el-col :span="5" style="margin-left:6px;">
 		      			<el-upload
 						  class="upload-demo"
-						  action="http://47.106.121.213:9992/oss/upload"
+						  action="https://www.parking.dda-iot.com/img/oss/upload"
 						  :on-error="handleErrorComp"
 						  :on-success="handleSuccessComp"
 						  :limit="3"
@@ -806,7 +807,7 @@
 		        },
 		        map:{},
 
-
+				showTree:false,
 		        dialogFormVisibleArea: false,
 				areaAllType:[{
 					label:'地上',
@@ -1135,8 +1136,8 @@
 		        	tdClass:'',
 		        	tdStyle:''
 				},
-				version:''
-				
+				version:'',
+				areaNodeKey:null
 			}
 		},
 		methods:{
@@ -1314,6 +1315,7 @@
 			},
 
 			handleNodeClick:function(data){
+				console.log(data,'data');
 				this.currentComp=data;
 				if(this.currentComp.type == 'io'){
 					this.$postRequest(getIoSingle(),{parkingIoId:this.currentComp.id}).then((data) => {
@@ -1627,7 +1629,7 @@
 						this.formSpace.y=data.data.ordinate;
 						
 						this.formSpace.userId=data.data.userId;
-
+						console.log(this.formSpace.userId,'this.formSpace.userId');
 
 			            if(data.data.spaceType=="private"){
 			            	this.userShow=true;
@@ -2021,7 +2023,8 @@
 				
 				this.dataSpace=jsTreeData;
 			},
-			getArea:function(id){
+			getArea:function(id,flag){
+
 				this.$get(getArea(),{
 					parkingId:id
 			    }).then((data) => {	
@@ -2078,6 +2081,22 @@
 					jsTreeData.push(itemOne);
 					
 					this.dataArea=jsTreeData;
+					if(flag==true){
+						if(this.$route.query.areaId){
+							let obj = {
+								id:this.$route.query.areaId
+							}
+							this.dataArea[0].children.forEach(item =>{
+								if(item.id == this.$route.query.areaId){
+									this.getMapInfo(item,true)
+									this.areaNodeKey = item.onlyId
+									
+									console.log(this.areaNodeKey,'this.areaNodeKey');
+								}
+							})
+						}
+					}
+					this.showTree = true
   				});
 			},
 
@@ -2098,7 +2117,7 @@
 			},
 
 			getMapInfo:function(nodeData,upDateTree){
-				// console.log(nodeData);
+				console.log(nodeData,upDateTree);
 				if (nodeData.level==1) return;
 				this.$get(getAreaAllData(),{
 					areaId:nodeData.id
@@ -2134,9 +2153,9 @@
 					};
 
 					if(upDateTree){
-						this.spaceTree(space);
-						this.ioTree(io);
-						this.compTree(comp);
+						this.spaceTree(space);   //车位列表
+						this.ioTree(io);		//出入口列表
+						this.compTree(comp);   //其他列表
 					}
 					
   				});
@@ -2616,15 +2635,15 @@
 			this.getIoType();
 
 			this.MQTTconnect();
-
+			
 			this.vueMqtt.client.onConnectionLost = this.onConnectionLost;
-            this.vueMqtt.client.onMessageArrived = this.onMessageArrived;
+			this.vueMqtt.client.onMessageArrived = this.onMessageArrived;
 		},
 		mounted:function(){
 			this.parkId=this.$route.query.id;
 			this.parkName=this.$route.query.name;
 			this.parkInfo.parkingName=this.$route.query.name;
-			this.getArea(this.parkId);
+			this.getArea(this.parkId,true);
 		},
 
 		destroyed:function(){
@@ -2633,10 +2652,10 @@
 		watch: {
 		    elements: {
 		     	handler: function (val, oldVal) {
-		     		this.permiss;
+					 this.permiss;
 		     	},
 		      	deep: true 	//深度
-		    }
+			},
 		}
 	}
 </script>

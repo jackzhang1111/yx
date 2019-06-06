@@ -103,8 +103,11 @@
 			...mapMutations(['getPage']),
 			getOrderType:function(){
 				this.$get(dictValue()+'/order_type').then((data) => {
-					this.allOrderType=data.data.rows;
+					this.allOrderType = data.data.rows;
+					this.allOrderType.unshift({labelZhCh:"请选择",value:""})
 				})
+				
+				
 			},
 			tableList:function(curPage,open){
 

@@ -40,6 +40,7 @@
                 </div>
                 <button @click="searchList" type="button" class="btn btn-primary" id="search_btn">查询</button>
                 <button @click="clearSearch" type="button" class="btn btn-default">清空</button>
+                <!-- <button @click="addSearch" type="button" class="btn btn-default">添加</button> -->
             </form>
 		</div>
 		
@@ -48,10 +49,10 @@
                 <thead>
                     <tr>
                         <td width="100">创建时间</td>
+                        <td width="100">停车场名称</td>
                         <td width="80">区层名称</td>
                         <td width="100">车位号码</td>
                         <td width="100">车位类型</td>
-                        <td width="100">车场名称</td>
                         <td width="100">操作</td>
                     </tr>
                 </thead>
@@ -59,12 +60,15 @@
                     <tr v-for="(item,index) in dataList" :key="index">
                         <td>{{item.crt_time}}</td>
                         <td>{{item.parking_name}}</td>
+                        <td>{{item.area_name}}</td>
                         <td>{{item.space_num}}</td>
                         <td>{{getType('spaceAllType',item.space_type)}}</td>
-                        <td>{{item.area_name}}</td>
                         <td>
-                            <a title="审核" href="javascript:;" >
-                                <span @click="bindEquip(item.space_id,item)">绑定设备</span>
+                            <a title="审核" href="javascript:;" v-if="carportlist_btn_bind">
+                                <span @click="bindEquip(item.space_id,item)">绑定设备&nbsp;&nbsp;</span>
+                            </a>
+                             <a title="审核" href="javascript:;" v-if="carportlist_btn_setcar">
+                                <span @click="editCarport(item)">车位设置</span>
                             </a>
                         </td>
                     </tr>
@@ -80,20 +84,20 @@
                         <span slot="label">*SN</span>
                         <el-row :gutter="5">
                             <el-col :span="20">
-                                <el-select v-model="bbb[index]" placeholder="请选择" style="width:100%;" @change="change" v-if="!ccc[index]"  @visible-change="ddd($event,item.typeCode)" :loading="loading"> 
-                                    <el-option  v-for="(i,index) in aaa" :key="index" :value="i.onerankdevDevSn"  >
+                                <el-select v-model="onerank[index]" placeholder="请选择" style="width:100%;" v-if="!statusList[index]"  @visible-change="change($event,item.typeCode)" :loading="loading"> 
+                                    <el-option  v-for="(i,index1) in onerankdevList" :key="index1" :value="i.onerankdevDevSn"  >
                                         <span style="float: left">设备ID:{{i.onerankdevTerminId}},&nbsp;&nbsp;</span>
                                         <span style="float: left">设备SN:{{i.onerankdevDevSn}}</span>
                                     </el-option>
                                 </el-select>
                                 <div class="el-input" v-else>
-                                    <div v-for="(spa,index) in spaceBindedList" :key="index">
-                                        <span v-if="item.typeCode == spa.onerankdevType" class="el-input__inner el-input-imitation">{{`设备ID:${spa.onerankdevTerminId},SN设备:${bbb[index]}`}}</span>
+                                    <div v-for="(spa,index2) in spaceBindedList" :key="index2">
+                                        <span v-if="item.typeCode == spa.onerankdevType" class="el-input__inner el-input-imitation">{{`设备ID:${spa.onerankdevTerminId},SN设备:${onerank[index]}`}}{{index}}</span>
                                     </div>
                                 </div>
                             </el-col>
                             <el-col :span="3">
-                                <button type="button" class="btn btn-default" v-if="ccc[index]" @click="relieve(bbb[index])">解绑</button>
+                                <button type="button" class="btn btn-default" v-if="statusList[index]" @click="relieve(onerank[index])">解绑</button>
                             </el-col>
                          </el-row>
                     </el-form-item>
@@ -104,6 +108,70 @@
                 </div>
             </el-dialog>
 
+        <!-- 添加/编辑车位 -->
+		<el-dialog title="添加/编辑车位" :visible.sync="dialogFormVisibleSpace" width="430px"  @close="closeDialogSpace">
+			<el-form ref="formSpace" label-position="right" :model="formSpace" :rules="rulesSpace" :label-width="formLabelWidth">
+				
+				<el-form-item label="所属区层">
+		    		<el-col :span="18">
+		      			<el-input readonly v-model="mergeName" auto-complete="off"></el-input>
+		      		</el-col>
+		      	</el-form-item>
+				
+				<el-form-item label="车位号码" prop="number">
+		    		<el-col :span="18">
+		      			<el-input v-model.trim="formSpace.number" auto-complete="off" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')"></el-input>
+		      		</el-col>
+		      	</el-form-item>
+		      	
+				
+				<el-form-item label="车位类型">
+		    		<el-col :span="18">
+		      			<el-select @change="changeSpaceType" v-model="formSpace.type" placeholder="请选择">
+						    <el-option
+						      v-for="item in spaceAllType"
+						      :key="item.index"
+						      :label="item.labelZhCh"
+						      :value="item.value">
+						    </el-option>
+						  </el-select>
+		      		</el-col>
+		      	</el-form-item>
+				
+				<el-form-item v-if="userShow" label="用户手机" prop="userId">
+		    		<el-col :span="18">
+		      			<el-select filterable v-model="formSpace.userId" placeholder="请选择">
+						    <el-option
+						      v-for="item in allUser"
+						      :key="item.id"
+						      :label="item.mobile"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+		      		</el-col>
+		      	</el-form-item>
+				
+				<el-form-item label="占格方向">
+		    		<el-col :span="18">
+		      			<el-select v-model="formSpace.toward" placeholder="请选择">
+						    <el-option
+						      v-for="item in spaceAllToward"
+						      :key="item.index"
+						      :label="item.label"
+						      :value="item.value">
+						    </el-option>
+						  </el-select>
+		      		</el-col>
+		      	</el-form-item>
+			</el-form>
+		  	
+		  	<div slot="footer" class="dialog-footer">
+		    	<el-button type="primary" @click="addEditSpaceTrue">确 定</el-button>
+		    	<el-button @click="dialogFormVisibleSpace = false">取 消</el-button>
+		  	</div>
+		</el-dialog>
+            
+
 		<div class="pagbox">
 			<el-pagination @current-change="currentChange" :current-page="search.page" :page-size="search.limit" :pager-count="5" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
 		</div>
@@ -111,13 +179,18 @@
 </template>
 
 <script>
-import {getQueryParkingSpaceApi,getSpaceBindEquipApi,getSpaceEquipApi,addBatchOnerankdeApi,spaceUnbindEquipApi} from '@/api/park/carportlist.js';
+import {mapGetters} from 'vuex';
+import {getQueryParkingSpaceApi,getSpaceBindEquipApi,getSpaceEquipApi,addBatchOnerankdeApi,spaceUnbindEquipApi,getSpaceSingleApi,editSpaceApi,addSpaceApi,getUserListApi} from '@/api/park/carportlist.js';
 export default {
     data() {
         return {
-            aaa:[],
-            bbb:[],
-            ccc:[],//初始化设备
+            carportlist_btn_bind:false,
+            carportlist_btn_setcar:false,
+
+            onerankdevList:[],
+            onerank:[],
+            allUser:[],//用户手机列表
+            statusList:[],//初始化设备
             search:{
                 page:1,
                 limit:15,
@@ -166,36 +239,92 @@ export default {
                     value:'private'
                 }
             ],
+            spaceAllToward:[{
+                label:'上',
+                value:'1'
+            },{
+                label:'右',
+                value:'2'
+            },{
+                label:'下',
+                value:'3'
+            },{
+                label:'左',
+                value:'4'
+            }],
+            formSpace: {
+                id:'',
+                userId:'',
+                number:'',
+                type:'common',
+                toward:'1',
+
+                angle:0,
+                zoom:100,
+                x:0,
+                y:0,
+
+                status:'normal',	//异常类型
+                lotType:'n'		//有无车
+            },
+            rulesSpace:{
+                number:[
+                    {
+                        required: true, 
+                        trigger: 'blur',
+                        type:'number',
+                        validator:(rule,value,callback)=>{
+                            // console.log(rule,value);
+                            if(value != ""){
+                                if((/^\d{6,6}$/).test(value) == false){
+                                    callback(new Error("请填写6位数字"));
+                                }else{
+                                    callback();
+                                }
+                            }else{
+                                callback(new Error("请填写车位号"));
+                            }
+                        }
+                    }
+                ],
+                userId:[
+                    { required: true, message: '请选择用户', trigger: ['blur', 'change'] }
+                ]
+            },
             currentItem:{},
             dataList:[],
             spaceEquipList:[],
             spaceBindedList:[],
             total:0,
             dialogFormVisible:false,
+            dialogFormVisibleSpace:false,
             loading:false,
+            userShow:false,
+            isAddcar:false,
             atEquip:{},
+            formLabelWidth: '100px',
             carId:''//当前车位ID
         };
     },
     created() {
         this.getQueryParkingSpace()
+        this.getUserList()
+        this.permiss
     },
     mounted() {
         
     },
     methods: {
         //设备绑定下拉框出现
-        ddd(flag,typeCode){
+        change(flag,typeCode){
             if(flag){
                 this.getSpaceEquip(typeCode)
             }
         },
-        change(value){
-            // console.log(this.bbb,value);
-        },
         //翻页
         currentChange(curPage){
             this.search.page = curPage
+            this.getQueryParkingSpace()
         },
         //点击查询
         searchList(){
@@ -233,7 +362,7 @@ export default {
             this.search.spaceNum = ''
             this.search.spaceType = ''
         },
-        //请求接口
+        //车位管理列表接口
         getQueryParkingSpace(){
             //去除前后空格
             this.search.spaceNum = this.search.spaceNum.trim()
@@ -265,7 +394,7 @@ export default {
         //设备列表
         getSpaceBindEquip(id){
             //先清空
-            this.bbb = []
+            this.onerank = []
             getSpaceBindEquipApi(id).then(res => {
                 if(res.status == 200){
                     this.spaceEquipList=res.data.sceneDevList;
@@ -274,11 +403,11 @@ export default {
                     this.spaceEquipList.forEach((item,index) => {
                         this.spaceBindedList.forEach((space) => {
                             if(item.typeCode == space.onerankdevType){
-                                this.bbb[index] = space.onerankdevDevSn
+                                this.onerank[index] = space.onerankdevDevSn
                             }
                         })
                     })
-                    this.ccc = this.$fn.copy(this.bbb)
+                    this.statusList = this.$fn.copy(this.onerank)
                 }
             })
         },
@@ -293,11 +422,12 @@ export default {
                 })
             })
         },
+        //查询可选设备接口
         getSpaceEquip(id){
             this.loading = true
             getSpaceEquipApi({devType:id}).then(res => {
                 if(res.status == 200){
-                    this.aaa = res.data.rows
+                    this.onerankdevList = res.data.rows
                 }
                 this.loading = false
             })
@@ -311,7 +441,7 @@ export default {
                     return arr.indexOf(v) === arr.lastIndexOf(v);
                 });
             }
-            arr1 = getArrDifference(this.ccc,this.bbb);
+            arr1 = getArrDifference(this.statusList,this.onerank);
             arr1.forEach(item => {
                 let obj = {
                     onerankdevSn:'',
@@ -321,7 +451,10 @@ export default {
                 obj.spaceId = this.atEquip.space_id
                 arr.push(obj)
             })
-            console.log(arr);
+            if(arr.length == 0){
+                this.dialogFormVisible = false
+                return
+            }
             this.addBatchOnerankde(arr)
         },
         //批量绑定设备
@@ -343,14 +476,125 @@ export default {
         //解绑按钮
         relieve(sn){
             this.spaceUnbindEquip(sn)
+        },
+        //更改车位类型
+        changeSpaceType:function(val){
+            if(val=="private"){
+                this.userShow=true;
+            }else{
+                this.userShow=false;
+            }
+        },
+        //关闭车位编辑弹窗
+        closeDialogSpace:function(){
+            this.$refs['formSpace'].resetFields();
+            this.formSpace.type='common';
+				
+        },
+        //车位点击确定按钮
+        addEditSpaceTrue(){
+            let obj = {
+                parkingId:this.formSpace.parkingId,
+                areaId:this.atEquip.area_id,
+                spaceId:this.formSpace.id,
+                spaceNum:this.formSpace.number,
+                spaceType:this.formSpace.type,
+                userId:this.formSpace.type=='private' ? this.formSpace.userId : '',
+                abscissa:this.formSpace.x,
+                ordinate:this.formSpace.y,
+                toward:this.formSpace.toward,
+                angle:this.formSpace.angle,
+                zoom:this.formSpace.zoom,
+                spaceStatus:this.formSpace.status,
+                lotType:this.formSpace.lotType,
+            }
+            if(this.isAddcar){
+
+            }else{
+                this.editSpace(obj)
+            }
+            console.log(obj,'obj');
+        },
+        //车位设置
+        editCarport(carport){
+            this.dialogFormVisibleSpace = true
+            this.isAddcar = false
+            this.atEquip = carport
+            this.getSpaceSingle(carport.space_id)
+        },
+        //添加
+        addSearch(){
+            this.dialogFormVisibleSpace = true
+            this.isAddcar = true
+
+        },
+        //查看车位信息
+        getSpaceSingle(id){
+            getSpaceSingleApi({spaceId:id}).then(res => {
+                if(res.status == 200){
+                    this.formSpace.id = res.data.spaceId;
+                    this.formSpace.number = res.data.spaceNum;
+                    this.formSpace.type = res.data.spaceType;
+                    this.formSpace.toward = res.data.toward;
+                    this.formSpace.angle = res.data.angle;
+                    this.formSpace.x = res.data.abscissa;
+                    this.formSpace.y = res.data.ordinate;
+                    this.formSpace.userId = res.data.userId;
+                    this.formSpace.parkingId = res.data.parkingId
+                    if(res.data.spaceType =="private"){
+                        this.userShow = true;
+                    }else{
+                        this.userShow = false;
+                    }
+                }
+            })
+        },
+        //修改车位
+        editSpace(data){
+            editSpaceApi(data,data.spaceId).then(res => {
+                if(res.status == 200){
+                    this.dialogFormVisibleSpace = false
+                    this.$message.success('修改成功');
+                    this.getQueryParkingSpace()
+                }
+            })
+        },
+        //新增车位
+        addSpace(){
+            addSpaceApi().then(res => {
+                
+            })
+        },
+        //用户手机列表
+        getUserList(){
+            getUserListApi({page:'1',limit:"200"}).then(res => {
+                if(res.status == 200){
+                    this.allUser=res.data.rows;
+                }
+            })
         }
     },
     computed:{
-        
+        ...mapGetters(['elements']),
+        permiss(){
+            this.carportlist_btn_setcar = this.elements['carportlist:btn_setcar'];
+            this.carportlist_btn_bind = this.elements['carportlist:btn_bind'];
+        },
+        mergeName(){
+            return this.atEquip.parking_name + '-' + this.atEquip.area_name
+        } 
     },
     components: {
         
     },
+    watch:{
+        elements: {
+            handler: function (val, oldVal) {
+                this.permiss;
+            },
+            deep: true 	//深度
+        }
+    }
 };
 </script>
 

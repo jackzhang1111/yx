@@ -66,8 +66,32 @@
 			<el-pagination @current-change="currentChange" :current-page="search.page" :page-size="search.limit" :pager-count="5" layout="total, prev, pager, next, jumper" :total="total"></el-pagination>
 		</div>
         <!-- 出入口详情 -->
-		<el-dialog title="详情" :visible.sync="dialogFormVisiblePhoto" width="500px">
-            <div class="dialog-top" >
+		<el-dialog title="详情" :visible.sync="dialogFormVisiblePhoto" :width="dialogWidth">
+            <el-row>
+                <el-col :span="12">
+                    <div class="dialog-top" >
+                        <div class="entrance-name">
+                            <span>入口名称:{{itemAccinId.parkingIoName}}</span>
+                        </div>
+                        <div class="entrance-img">
+                            <span>入口照片</span>
+                        </div>
+                        <img :src="itemDetail.accPhoto" class="img-width">
+                    </div>
+                </el-col>
+                <el-col :span="12" v-if="itemDetail.gououtPhoto != 'null' && itemDetail.gououtPhoto">
+                     <div class="dialog-top" >
+                        <div class="exit-name">
+                            <span>出口名称:{{itemExitId.parkingIoName}}</span>
+                        </div>
+                        <div class="exit-phone">
+                            <span>出口照片</span>
+                        </div>
+                        <img :src="itemDetail.gououtPhoto" class="img-width">
+                    </div>
+                </el-col>
+            </el-row>
+            <!-- <div class="dialog-top" >
                 <div class="entrance-name">
                     <span>入口名称:{{itemAccinId.parkingIoName}}</span>
                 </div>
@@ -75,8 +99,8 @@
                     <span>入口照片</span>
                 </div>
                 <img :src="itemDetail.accPhoto" class="img-width">
-            </div>
-            <div class="dialog-top" v-if="itemDetail.gououtPhoto != 'null' && itemDetail.gououtPhoto">
+            </div> -->
+            <!-- <div class="dialog-top" v-if="itemDetail.gououtPhoto != 'null' && itemDetail.gououtPhoto">
                 <div class="exit-name">
                     <span>出口名称:{{itemExitId.parkingIoName}}</span>
                 </div>
@@ -84,7 +108,7 @@
                     <span>出口照片</span>
                 </div>
                 <img :src="itemDetail.gououtPhoto" class="img-width">
-            </div>
+            </div> -->
             <div slot="footer" class="dialog-footer">
 		    	<el-button type="primary" @click="dialogFormVisiblePhoto = false">确 定</el-button>
 		 	</div>
@@ -112,7 +136,8 @@ export default {
             itemDetail:{},
             itemAccinId:{},
             itemExitId:{},
-            getTime:getTime
+            getTime:getTime,
+            dialogWidth:"1100px"
         };
     },
     created() {
@@ -184,6 +209,11 @@ export default {
             this.itemDetail = item
             this.itemAccinId = this.itemDetail.accinParkingIo
             this.itemExitId = this.itemDetail.exitId ? this.itemDetail.exitParkingIo:{}
+            if(this.itemDetail.gououtPhoto != 'null' && this.itemDetail.gououtPhoto){
+                this.dialogWidth = '1000px'
+            }else{
+                this.dialogWidth = '500px'
+            }
         },
     },
     components: {

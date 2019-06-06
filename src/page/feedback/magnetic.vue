@@ -7,7 +7,7 @@
 	      			<el-select style="width:150px;" v-model="search.errorType" placeholder="请选择">
 					    <el-option
 					      v-for="(item,index) in allErrorType"
-					      :key="item.index"
+					      :key="index"
 					      :label="item.labelZhCh"
 					      :value="item.value">
 					    </el-option>
@@ -98,7 +98,7 @@
 					<el-select v-model="form.status" placeholder="请选择">
 		        		<el-option
 					      v-for="(item,index) in allDealStatus"
-					      :key="item.index"
+					      :key="index"
 					      :label="item.labelZhCh"
 					      :value="item.value">
 					    </el-option>
@@ -163,6 +163,7 @@
 			getErrorType:function(){
 				this.$get(dictValue()+'/error_type').then((data) => {
 					this.allErrorType=data.data.rows;
+					this.allErrorType.unshift({labelZhCh:"请选择",value:""})
 				})
 			},
 			tableList:function(curPage,open){

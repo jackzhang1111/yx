@@ -39,6 +39,7 @@
                         <td width="100">购买账户</td>
                         <td width="80">车牌号</td>
                         <td width="100">购买时间</td>
+                        <td width="100">开始时间</td>
                         <td width="100">到期时间</td>
                         <td width="100">停车场</td>
                     </tr>
@@ -47,6 +48,7 @@
                     <tr v-for="(item,index) in dataList" :key="index">
                         <td>{{item.moncards_telephone}}</td>
                         <td>{{item.car_number}}</td>
+                        <td>{{item.crt_time}}</td>
                         <td>{{item.start_date}}</td>
                         <td>{{item.end_date}}</td>
                         <td>{{item.parking_name}}</td>
@@ -63,6 +65,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 import {getQueryMonthCardsApi} from '@/api/park/cardlist.js';
 export default {
     data() {
@@ -89,6 +92,7 @@ export default {
         //翻页
         currentChange(curPage){
             this.search.page = curPage
+            this.getQueryMonthCards()
         },
         //点击查询
         searchList(){
@@ -139,9 +143,23 @@ export default {
             })
         },
     },
+    computed:{
+        ...mapGetters(['elements']),
+        permiss(){
+
+        },
+    },
     components: {
         
     },
+    watch:{
+        elements: {
+            handler: function (val, oldVal) {
+                this.permiss;
+            },
+            deep: true 	//深度
+        }
+    }
 };
 </script>
 

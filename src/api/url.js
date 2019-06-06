@@ -115,7 +115,7 @@ export const addConsultList = () =>urlPk+'parking/parkingAdvisory';
 export const getConsultList = () =>urlPk+'parking/parkingAdvisory/page';
 export const getConsultSingle = () =>urlPk+'parking/parkingAdvisory/one';
 
-
+export const action = () =>urlImg+'oss/upload/';
 
 
 

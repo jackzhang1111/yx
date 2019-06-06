@@ -6,7 +6,7 @@
                 <div>
                     <el-upload
                       class="avatar-uploader"
-                      action="http://47.106.121.213:9992/oss/upload"
+                      action="https://www.parking.dda-iot.com/img/oss/upload"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :data='{pathName:"itparking/web"}'>
@@ -121,6 +121,8 @@
         mounted:function(){
             this.conId=this.$route.query.id;
             this.getConsult();
+        },
+        created(){
         }
     }
 </script>

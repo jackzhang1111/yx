@@ -7,7 +7,7 @@
 	      			<el-select style="width:150px;" v-model="search.fbType" placeholder="请选择">
 					    <el-option
 					      v-for="(item,index) in allFbType"
-					      :key="item.index"
+					      :key="index"
 					      :label="item.labelZhCh"
 					      :value="item.value">
 					    </el-option>
@@ -57,7 +57,7 @@
                     </tr>
                 </thead>
                 <tbody id="tbody">
-                    <tr v-for="item in tableListData.rows">
+                    <tr v-for="(item,index) in tableListData.rows" :key="index">
                         <td>{{item.fbDate}}</td>
                         <!-- <td>{{item.userId}}</td> -->
                         <td>{{item.fbType=='exit_error'?'无车报有车':'有车报无车'}}</td>
@@ -88,7 +88,7 @@
                         <img :src="imgUrl" alt="" style="max-height:300px;max-width:540px;">
                     </div>
                     <ul class="tab-img clearfix">
-                    	<li class="fl" @click="handleClickTag(item)" v-for="(item,index) in allImgUrl">
+                    	<li class="fl" @click="handleClickTag(item)" v-for="(item,index) in allImgUrl" :key="index">
                     		<a href="javascript:;"><img :src="item" alt="" width="100%" height="100%"></a>
                     	</li>
                     </ul>
@@ -112,7 +112,7 @@
 					<el-select v-model="form.status" placeholder="请选择">
 		        		<el-option
 					      v-for="(item,index) in allDealStatus"
-					      :key="item.index"
+					      :key="index"
 					      :label="item.labelZhCh"
 					      :value="item.value">
 					    </el-option>
@@ -182,6 +182,7 @@
 			getFbType:function(){
 				this.$get(dictValue()+'/feedback_type').then((data) => {
 					this.allFbType=data.data.rows;
+					this.allFbType.unshift({labelZhCh:"请选择",value:""})
 				})
 			},
 			tableList:function(curPage,open){

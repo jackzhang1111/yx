@@ -40,3 +40,41 @@ export function spaceUnbindEquipApi(params) {
     method: 'delete',
   })
 }
+
+//查看车位信息
+export function getSpaceSingleApi(params) {
+  return park({
+    url: `parking/parkingSpace/one`,
+    method: 'post',
+    data:params
+  })
+}
+
+//修改车位
+export function editSpaceApi(params,id) {
+  return park({
+    responseType:'json',
+    url: `parking/parkingSpace/${id}`,
+    method: 'put',
+    data:params
+  })
+}
+
+//新增车位
+export function addSpaceApi(params) {
+  return park({
+    responseType:'json',
+    url: `parking/parkingSpace`,
+    method: 'post',
+    data:params
+  })
+}
+
+//用户手机列表
+export function getUserListApi(params) {
+  return main({
+    url: `parking/appUser/page`,
+    method: 'get',
+    params
+  })
+}
