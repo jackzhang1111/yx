@@ -140,6 +140,9 @@
 					children:[{
 						href:"/main/regulation/rentOut",
 						title:"出租规则"
+					},{
+						href:"/main/regulation/userGuide",
+						title:"操作说明"
 					}]
 				}],
 	            // isCollapse:false,
@@ -153,7 +156,7 @@
 				
 				this.$get(menu_url(),{}).then((data) => {
         				
-			            _this.sidearr=data[0].children;
+			            // _this.sidearr=data[0].children;
       				});
 			},
 	        handleOpen:function(key, keyPath) {

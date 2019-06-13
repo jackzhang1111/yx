@@ -47,6 +47,9 @@ import RoadsideControl from '@/page/access/roadsideControl.vue'
 //出租规则
 import RentOut from '../page/regulation/rentOut.vue'
 
+//操作指南
+import userGuide from '../page/regulation/userGuide.vue'
+
 Vue.use(Router)
 
 export default new Router({
@@ -171,6 +174,10 @@ export default new Router({
             path: '/main/regulation/rentOut',
             name:'出租规则',
             component:RentOut
+        },{
+            path: '/main/regulation/userGuide',
+            name:'操作说明',
+            component:userGuide
         }]
     }
   ]

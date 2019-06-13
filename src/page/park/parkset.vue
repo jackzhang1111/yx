@@ -491,6 +491,12 @@
 						  </el-select>
 		      		</el-col>
 		      	</el-form-item>
+
+				  <el-form-item label="是否包含充电桩">
+		    		<el-col :span="18">
+		      			<el-switch v-model="formSpace.chargePile" active-color="#13ce66" inactive-color="#ff4949" active-value="y" inactive-value="n"></el-switch>
+		      		</el-col>
+		      	</el-form-item>
 			</el-form>
 		  	
 		  	<div slot="footer" class="dialog-footer">
@@ -756,7 +762,7 @@
 					}]
 				}],
 
-			    formLabelWidth: '100px',
+			    formLabelWidth: '120px',
 
 			    dialogFormVisible: false,
 			    allParkingBusType:[],
@@ -932,7 +938,7 @@
 		          	number:'',
 		          	type:'common',
 		          	toward:'1',
-
+					chargePile:'',
 		          	angle:0,
 		          	zoom:100,
 		          	x:0,
@@ -1627,7 +1633,7 @@
 			            this.formSpace.angle=data.data.angle;
 			            this.formSpace.x=data.data.abscissa;
 						this.formSpace.y=data.data.ordinate;
-						
+						this.formSpace.chargePile = data.data.chargePile
 						this.formSpace.userId=data.data.userId;
 						console.log(this.formSpace.userId,'this.formSpace.userId');
 
@@ -1667,7 +1673,7 @@
 
 								spaceStatus:_this.formSpace.status,
 								lotType:_this.formSpace.lotType,
-								
+								chargePile:_this.formSpace.chargePile
 
 							}).then((data) => {
 		        				if(data.status!=200) return _this.$message.error(data.message);
@@ -1691,7 +1697,7 @@
 
 								spaceStatus:_this.formSpace.status,
 								lotType:_this.formSpace.lotType,
-
+								chargePile:_this.formSpace.chargePile
 							}).then((data) => {
 		        				if(data.status!=200) return _this.$message.error(data.message);
 					            _this.getMapInfo(_this.areaInfo,true);
@@ -2186,9 +2192,8 @@
 				for(var i in PD.parking_space_list){
 					xx = PD.parking_space_list[i].abscissa;
 					yy = PD.parking_space_list[i].ordinate;
-					
 					ele_type = 1;
-					if(PD.parking_space_list[i].spaceStatus=='normal'){
+					if(PD.parking_space_list[i].spaceStatus=='normal'){//异常类型
 						ele_attr = PD.parking_space_list[i].spaceType+PD.parking_space_list[i].lotType;
 					}else{
 						ele_attr = PD.parking_space_list[i].spaceType+PD.parking_space_list[i].spaceStatus;
@@ -2205,9 +2210,12 @@
 					if(x==xx&&y==yy){
 
 						hasComp=true;
+						console.log(PD.parking_space_list[i]);
 						switch(PD.parking_space_list[i].toward*1){
+							
 							case 1://上
 								arrTd.push('<td style="position: relative;z-index:1;-webkit-transform: rotate(0deg) scaley(2);transform: rotate(0deg) scaley(2);top: -25px;" title="X：'+x+'\nY：'+y+'" class="z_component_'+ele_type+'_'+ele_attr+' cid_'+ele_component_id+' car car1">');
+								console.log(ele_attr,'s');
 								break;
 							case 2://右
 								arrTd.push('<td style="position: relative;z-index:1;-webkit-transform: rotate(90deg) scaley(2);transform: rotate(90deg) scaley(2);left: 25px;" title="X：'+x+'\nY：'+y+'" class="z_component_'+ele_type+'_'+ele_attr+' cid_'+ele_component_id+' car car2">');

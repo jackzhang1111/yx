@@ -59,7 +59,7 @@
                         <td>{{item.orderNum}}</td>
                         <td>{{item.orderType}}</td>
                         <td>{{!item.plate?'':item.plate.carNumber}}</td>
-                        <td>{{!item.space?'':item.space.spaceNum}}</td>
+                        <td>{{!item.parkingSpace?'':item.parkingSpace.spaceNum}}</td>
                         <td>{{item.beginDate}}</td>
                         <td>{{item.endDate}}</td>
                         <td>{{item.realMoney}}</td>
