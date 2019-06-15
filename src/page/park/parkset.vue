@@ -2194,7 +2194,7 @@
 					yy = PD.parking_space_list[i].ordinate;
 					ele_type = 1;
 					if(PD.parking_space_list[i].spaceStatus=='normal'){//异常类型
-						ele_attr = PD.parking_space_list[i].spaceType+PD.parking_space_list[i].lotType;
+						ele_attr = PD.parking_space_list[i].spaceType+PD.parking_space_list[i].lotType+PD.parking_space_list[i].chargePile;
 					}else{
 						ele_attr = PD.parking_space_list[i].spaceType+PD.parking_space_list[i].spaceStatus;
 					}
@@ -2788,11 +2788,11 @@
 
 	/* 普通车位 */
 	/* 无车 */
-	.z_component_1_commonn div {
+	.z_component_1_commonnn div {
 		background-image: url(../../assets/images/parking_up.png);
 	}
 	/* 有车 */
-	.z_component_1_commony div {
+	.z_component_1_commonyn div {
 		background-image: url(../../assets/images/parking_up_park.png);
 	}
 	/* 地磁上报异常 */
@@ -2814,10 +2814,10 @@
 	
 
 	/* VIP车位 */
-	.z_component_1_vipn div {
+	.z_component_1_vipnn div {
 		background-image: url(../../assets/images/parking_up_vip.png);
 	}
-	.z_component_1_vipy div {
+	.z_component_1_vipyn div {
 		background-image: url(../../assets/images/parking_up_vip_park.png);
 	}
 	.z_component_1_vipgeomagnetic div {
@@ -2834,10 +2834,10 @@
 	}
 
 	/*临时车位 */
-	.z_component_1_temporaryn div {
+	.z_component_1_temporarynn div {
 		background-image: url(../../assets/images/parking_up_temp.png);
 	}
-	.z_component_1_temporaryy div {
+	.z_component_1_temporaryyn div {
 		background-image: url(../../assets/images/parking_up_temp_park.png);
 	}
 	.z_component_1_temporarygeomagnetic div {
@@ -2855,10 +2855,10 @@
 	
 
 	/* 私人车位 */
-	.z_component_1_privaten div {
+	.z_component_1_privatenn div {
 		background-image: url(../../assets/images/parking_up_owner.png);
 	}
-	.z_component_1_privatey div {
+	.z_component_1_privateyn div {
 		background-image: url(../../assets/images/parking_up_owner_park.png);
 	}
 	.z_component_1_privategeomagnetic div {
@@ -2882,5 +2882,28 @@
 	/* 出口 */
 	.z_component_2_exit div {
 		background-image: url(../../assets/images/component_3_1.gif);
+	}
+
+	/* 充电桩 */
+	/* 私人 */
+	.z_component_1_privateny div {
+		background-image: url(../../assets/images/parking_up_owner_charging.png);
+	}
+	.z_component_1_privateyy div {
+		background-image: url(../../assets/images/parking_up_owner_park__charging.png);
+	}
+	/* vip */
+	.z_component_1_vipny div {
+		background-image: url(../../assets/images/parking_up_vip__charging.png);
+	}
+	.z_component_1_vipyy div {
+		background-image: url(../../assets/images/parking_up_vip_park__charging.png);
+	}
+	/* 普通 */
+	.z_component_1_commonny div {
+		background-image: url(../../assets/images/parking_up_charging.png);
+	}
+	.z_component_1_commonyy div {
+		background-image: url(../../assets/images/parking_up_park_charging.png);
 	}
 </style>

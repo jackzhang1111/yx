@@ -57,7 +57,7 @@
                     <tr v-for="(item,index) in tableListData.rows" :key="index">
                         <td>{{item.crtTime}}</td>
                         <td>{{item.carNumber}}</td>
-                        <td>{{item.appUser.name}}</td>
+                        <td>{{item.appUser ? item.appUser.name:''}}</td>
                         
                         
                         <td>
