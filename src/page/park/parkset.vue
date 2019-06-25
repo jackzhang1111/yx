@@ -27,7 +27,7 @@
 				<!-- 场区 -->
 					<div class="item-area" :class="{dn:command!='1'}">
 						<div class="public_list" id="i_area">
-							<el-tree :data="dataArea" :props="defaultProps" @node-click="getMapInfo" node-key="onlyId" :highlight-current="true" :default-expand-all="false" :show-checkbox="false" :default-expanded-keys="['1_0']" :current-node-key ="areaNodeKey" v-if="showTree">
+							<el-tree :data="dataArea" :props="defaultProps" @node-click="eee" node-key="onlyId" :highlight-current="true" :default-expand-all="false" :show-checkbox="false" :default-expanded-keys="['1_0']" :current-node-key ="areaNodeKey" v-if="showTree">
 								<span class="" slot-scope="{ node, data }">
 									
 									<span class="tree-label">{{ node.label}}</span>
@@ -201,21 +201,11 @@
 
 				</div>
 				<div class="panel-body">
-					<div class="map-div" id="map_div">
-						<table ref='workTable' :style="{ width: areaInfo.width + 'px', height: areaInfo.height + 'px', background: 'url('+areaInfo.background+') no-repeat left top',backgroundSize:'contain', transform: 'scale('+this.areaInfo.scale+')', transformOrigin: 'top left'}" id="map_workspace" class="map_workspace" @click="addCompToMap($event)" @mousedown="handleMousedown($event)" @mouseup="handleMouseup($event)" @contextmenu="handleContextmenu($event)">
-							<tbody v-html="areaInfo.table">
-								<!-- <tr v-for="(x,n) in areaInfo.y" v-html="$options.filters.detailEquipData(result)">
-									<td v-for="(y,m) in areaInfo.x">1</td>
-								</tr> -->
-								<!-- <tr v-for="(y,n) in areaInfo.y">
-									<td v-for="(x,m) in areaInfo.x">
-										
-									</td>
-									
-								</tr> -->
-							</tbody>
-						</table>
+					<div class="console" >
+						<el-button type="primary" @click="prClick">主要按钮</el-button>
 					</div>
+					<div id="brtmap" v-if="lll"></div>
+					
 				</div>
 			</div>
 
@@ -685,17 +675,24 @@
 	</div>
 	
 </template>
+<script type="text/javascript" src="https://files.brtbeacon.net/BRTMap/3D/brtmap-2.3.2.js"></script>
+
 <script>
 	import { mapGetters } from 'vuex';
 
 	import {parkingBusType,dictValue,getUserList,getCity,parkAdd,getParkSingle,addMapOverlay,addMapOverlayl,setMapEvent,addMapControl,getManagerList, getArea,getAreaAllData,getAreaSingle,addEditArea, addEditSpace,getSpaceSingle,addEditIo,getIoSingle,addEditComp,getCompSingle,addDataComp,getDataSingle,getSpaceBindEquip,getSpaceEquip,spaceBindEquip,spaceUnbindEquip, getIoBindEquip,getIoEquip,ioBindEquip,ioUnbindEquip, qrCode} from '../../api/url.js';
-
+	import {getSpaceSingleApi} from '@/api/park/carportlist.js';
 	import Paho from '../../utils/mqttws31.js';
 
-	
+	import ccc from '@/assets/images/parking_up_ban2.png'
+	import kkk from '@/assets/images/parking_up_vip.png'
+
+	import obj from './test'
 	export default {
 		data(){
 			return{
+				lll:true,
+				aaaIndex:1,
 				parkset_btn_edit:false,
 				parkset_btn_editArea:false,
 				parkset_btn_addArea:false,
@@ -812,7 +809,7 @@
 			        
 		        },
 		        map:{},
-
+				www:{},
 				showTree:false,
 		        dialogFormVisibleArea: false,
 				areaAllType:[{
@@ -946,7 +943,10 @@
 
 		          	status:'normal',	//异常类型
 		          	lotType:'n'		//有无车
-		        },
+				},
+				buildingID:'07550063',
+				token:'ef124b1221b5447393203e648bdec08e',
+				marker:null,
 		        rulesSpace:{
 		        	number:[
 			            {
@@ -1143,7 +1143,9 @@
 		        	tdStyle:''
 				},
 				version:'',
-				areaNodeKey:null
+				areaNodeKey:null,
+				spaceObj:null,
+				mapLngLat:null
 			}
 		},
 		methods:{
@@ -1322,6 +1324,11 @@
 
 			handleNodeClick:function(data){
 				console.log(data,'data');
+				getSpaceSingleApi({spaceId: data.id}).then(res => {
+					if(res.status == 200){
+						this.spaceObj = res.data
+					}
+				})
 				this.currentComp=data;
 				if(this.currentComp.type == 'io'){
 					this.$postRequest(getIoSingle(),{parkingIoId:this.currentComp.id}).then((data) => {
@@ -1329,62 +1336,6 @@
 						this.version = data.data.version
 					});
 				}
-			},
-			addCompToMap:function(e){
-				// console.log(e,123);
-				var target= e.srcElement ? e.srcElement : e.target;
-				if(target.tagName!="TD") return;
-
-				var x = target.cellIndex + 1;;
-				var y = target.parentNode.rowIndex + 1;
-
-				if(this.currentComp.type=='N') return;
-
-				if(this.currentComp.type=='space'){
-					// console.log(x,y);
-					this.$putRequest(addEditSpace()+'/'+this.currentComp.id,{
-						parkingId:this.parkId,
-						areaId:this.areaInfo.id,
-
-						spaceId:this.currentComp.id,
-						userId:this.currentComp.userId,
-						abscissa:x,
-						ordinate:y
-
-					}).then((data) => {
-        				if(data.status!=200) return;
-			            this.getMapInfo(this.areaInfo,false);
-      				});
-
-				}else if(this.currentComp.type=='io'){
-					this.$putRequest(addEditIo()+'/'+this.currentComp.id,{
-						parkingId:this.parkId,
-						parkingAreaId:this.areaInfo.id,
-
-						parkingIoId:this.currentComp.id,
-						x: x,
-						y: y,
-						version:this.version
-
-					}).then((data) => {
-        				if(data.status!=200) return;
-			            this.getMapInfo(this.areaInfo,false);
-      				});
-				}else if(this.currentComp.type=='comp'){
-					this.$postRequest(addDataComp(),{
-						parkingId:this.parkId,
-						parkingAreaId:this.areaInfo.id,
-
-						parkingComponentId:this.currentComp.id,
-						x: x,
-						y: y
-
-					}).then((data) => {
-        				if(data.status!=200) return;
-			            this.getMapInfo(this.areaInfo,false);
-      				});
-				}
-
 			},
 
 			getParkingBusType:function(){
@@ -2030,7 +1981,9 @@
 				this.dataSpace=jsTreeData;
 			},
 			getArea:function(id,flag){
-
+				if(this.www.remove){
+					this.lll = false
+				}
 				this.$get(getArea(),{
 					parkingId:id
 			    }).then((data) => {	
@@ -2121,7 +2074,11 @@
 					this.headTitle='其他部件';
 				}
 			},
-
+			eee(nodeData,upDateTree){
+				this.getMapInfo(nodeData,upDateTree)
+				this.aaa()
+				
+			},
 			getMapInfo:function(nodeData,upDateTree){
 				console.log(nodeData,upDateTree);
 				if (nodeData.level==1) return;
@@ -2149,7 +2106,10 @@
 					this.areaInfo.height=parkArea.height*this.areaInfo.size;
 
 					this.initTable(parkArea.width,parkArea.height,this.PD,this.areaInfo.size);
-
+					space.forEach(item => {
+						let fff = item.spaceType+item.lotType+item.chargePile;
+						console.log(fff,'fff');
+					})
 					/*给table添加背景图*/
 					if(parkArea.bgimgFlag==1){
 						this.areaInfo.background=parkArea.bgImg;
@@ -2210,12 +2170,12 @@
 					if(x==xx&&y==yy){
 
 						hasComp=true;
-						console.log(PD.parking_space_list[i]);
+						// console.log(PD.parking_space_list[i]);
 						switch(PD.parking_space_list[i].toward*1){
 							
 							case 1://上
 								arrTd.push('<td style="position: relative;z-index:1;-webkit-transform: rotate(0deg) scaley(2);transform: rotate(0deg) scaley(2);top: -25px;" title="X：'+x+'\nY：'+y+'" class="z_component_'+ele_type+'_'+ele_attr+' cid_'+ele_component_id+' car car1">');
-								console.log(ele_attr,'s');
+								// console.log(ele_attr,'s');
 								break;
 							case 2://右
 								arrTd.push('<td style="position: relative;z-index:1;-webkit-transform: rotate(90deg) scaley(2);transform: rotate(90deg) scaley(2);left: 25px;" title="X：'+x+'\nY：'+y+'" class="z_component_'+ele_type+'_'+ele_attr+' cid_'+ele_component_id+' car car2">');
@@ -2546,6 +2506,70 @@
 				}
 				this.dialogFormVisibleBase=false;
 			},
+			aaa(){
+				var buildingID = this.buildingID;
+				var token = this.token;
+				var _this = this
+				this.lll = true
+				//初始化地图
+				setTimeout(()=>{
+					var $map = new brtmap.Map({
+					container: 'brtmap',
+					token:token,
+					buildingID: buildingID,
+					doubleClickZoom:false,
+					touchZoomRotate:false
+				});
+
+				this.www = $map
+				var $marker;
+				let ii = obj.ccc
+				$map.on('mapready',function(){
+					
+					$marker = new brtmap.Symbol.Marker({
+						url:ii,
+						size:0.6,
+						offset:[0,0],
+						angle:90,
+						
+					}).addTo($map);
+					
+					let obj = {
+						lng:113.93519769824559,
+						lat:22.5466037646639
+					}
+					$marker.setLnglat(obj);
+				});
+				
+				// click
+				$map.on('click',function(e){
+					let pic = null
+					if(_this.aaaIndex == 1){
+						if(_this.currentComp.type == 'space'){
+							pic = obj.kkk
+						}
+						console.log(_this.currentComp);
+						$marker = new brtmap.Symbol.Marker({
+							url:pic,
+							size:0.6,
+							offset:[0,-2]
+						}).addTo($map);
+						if(pic != null){
+							_this.aaaIndex++ 
+						}
+						$marker.setLnglat(e.lngLat);
+						
+					}else{
+						$marker.setLnglat(e.lngLat);
+					}
+					_this.mapLngLat = e.lngLat
+				});
+					var bbb = document.getElementsByClassName('mapboxgl-canvas')[0]
+					bbb.style.position = 'relative'
+				},100)
+				
+			},
+			
 			removeBase:function(){
 				var componentType=this.formBase.typeCode;
 				if(componentType=='1'){
@@ -2601,8 +2625,11 @@
 				
 				this.dialogFormVisibleBase=false;
 
+			},
+			prClick(){
+				this.aaaIndex = 1
+				console.log(123);
 			}
-
 		},
 		computed:{
 			...mapGetters([
@@ -2667,7 +2694,10 @@
 		}
 	}
 </script>
-<style scoped>
+<style scoped lang="less">
+	#brtmap{
+		height: 100%
+	}
 	.aside{
 		position: absolute;
 		left:16px;
