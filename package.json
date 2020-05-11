@@ -19,7 +19,7 @@
     "js-cookie": "2.2.0",
     "js-md5": "^0.7.3",
     "sass": "^1.18.0",
-    "tinymce": "^4.8.2",
+    "tinymce": "^4.9.10",
     "vue": "^2.5.2",
     "vue-layer": "^0.9.8",
     "vue-quill-editor": "^3.0.6",
